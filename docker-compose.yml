@@ -1,0 +1,30 @@
+version: '3.6'
+
+services:
+
+  db:
+    build: docker/dev/db
+
+  backend:
+    build:
+      context: .
+      dockerfile: docker/dev/backend/Dockerfile
+    volumes:
+      - ./backend:/app/src
+    depends_on:
+      - db
+
+  frontend:
+    build:
+      context: .
+      dockerfile: docker/dev/frontend/Dockerfile
+    volumes:
+      - ./frontend/src:/app/src
+
+  web:
+    build: docker/dev/web
+    depends_on:
+      - backend
+      - frontend
+    ports:
+      - ${PORT:-8080}:80
