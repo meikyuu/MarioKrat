@@ -54,16 +54,16 @@ def schedule(tournament, shuffle=True):
             ))
             next_name = get_next_name(next_name)
 
-        # Add participants to games
+        # Add players in to games
         for game, slot in zip(cycle(games), slots):
             slot.target = game
             slot.save()
 
-        # Add results to games
+        # Add players out to games
         if len(games) == 1:
             # Final game so we divide ranks here
             game = games[0]
-            for pos in range(1, game.participants.count() + 1):
+            for pos in range(1, game.players_in.count() + 1):
                 Slot.objects.create(
                     tournament=tournament,
                     source=game,
@@ -75,7 +75,7 @@ def schedule(tournament, shuffle=True):
             # We group the new slots by rank
             new_slots = defaultdict(list)
             for game in games:
-                for pos in range(1, game.participants.count() + 1):
+                for pos in range(1, game.players_in.count() + 1):
                     new_slots[pos].append(Slot.objects.create(
                         tournament=tournament,
                         source=game,

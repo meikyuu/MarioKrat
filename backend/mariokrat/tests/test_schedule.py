@@ -9,7 +9,11 @@ class TestSchedule(TestCase):
     def test_schedule_8_players(self):
         tournament = Tournament.objects.create(name='Tournament')
         players = [
-            Player.objects.create(tournament=tournament, name=f'Player {n}')
+            Player.objects.create(
+                tournament=tournament,
+                number=n,
+                name=f'Player {n}',
+            )
             for n in range(1, 9)
         ]
 
@@ -23,108 +27,108 @@ class TestSchedule(TestCase):
         game_d = tournament.games.get(name='D')
 
         # Game A
-        self.assertEqual(game_a.participants.count(), 4)
-        self.assertEqual(game_a.results.count(), 4)
+        self.assertEqual(game_a.players_in.count(), 4)
+        self.assertEqual(game_a.players_out.count(), 4)
         self.assertTrue(
-            game_a.participants
+            game_a.players_in
             .filter(player=players[0])
             .exists()
         )
         self.assertTrue(
-            game_a.participants
+            game_a.players_in
             .filter(player=players[2])
             .exists()
         )
         self.assertTrue(
-            game_a.participants
+            game_a.players_in
             .filter(player=players[4])
             .exists()
         )
         self.assertTrue(
-            game_a.participants
+            game_a.players_in
             .filter(player=players[6])
             .exists()
         )
 
         # Game B
-        self.assertEqual(game_b.participants.count(), 4)
-        self.assertEqual(game_b.results.count(), 4)
+        self.assertEqual(game_b.players_in.count(), 4)
+        self.assertEqual(game_b.players_out.count(), 4)
         self.assertTrue(
-            game_b.participants
+            game_b.players_in
             .filter(player=players[1])
             .exists()
         )
         self.assertTrue(
-            game_b.participants
+            game_b.players_in
             .filter(player=players[3])
             .exists()
         )
         self.assertTrue(
-            game_b.participants
+            game_b.players_in
             .filter(player=players[5])
             .exists()
         )
         self.assertTrue(
-            game_b.participants
+            game_b.players_in
             .filter(player=players[7])
             .exists()
         )
-        self.assertEqual(game_b.results.count(), 4)
+        self.assertEqual(game_b.players_out.count(), 4)
 
         # Game C
-        self.assertEqual(game_c.participants.count(), 4)
-        self.assertEqual(game_c.participants.count(), 4)
+        self.assertEqual(game_c.players_in.count(), 4)
+        self.assertEqual(game_c.players_in.count(), 4)
         self.assertTrue(
-            game_c.participants
+            game_c.players_in
             .filter(source=game_a, position=1)
             .exists()
         )
         self.assertTrue(
-            game_c.participants
+            game_c.players_in
             .filter(source=game_b, position=1)
             .exists()
         )
         self.assertTrue(
-            game_c.participants
+            game_c.players_in
             .filter(source=game_a, position=2)
             .exists()
         )
         self.assertTrue(
-            game_c.participants
+            game_c.players_in
             .filter(source=game_b, position=2)
             .exists()
         )
 
         # Game D
-        self.assertEqual(game_d.participants.count(), 4)
-        self.assertEqual(game_d.participants.count(), 4)
+        self.assertEqual(game_d.players_in.count(), 4)
+        self.assertEqual(game_d.players_in.count(), 4)
         self.assertTrue(
-            game_d.participants
+            game_d.players_in
             .filter(source=game_a, position=3)
             .exists()
         )
         self.assertTrue(
-            game_d.participants
+            game_d.players_in
             .filter(source=game_b, position=3)
             .exists()
         )
         self.assertTrue(
-            game_d.participants
+            game_d.players_in
             .filter(source=game_a, position=4)
             .exists()
         )
         self.assertTrue(
-            game_d.participants
+            game_d.players_in
             .filter(source=game_b, position=4)
             .exists()
         )
 
         # Ranks
-        self.assertTrue(game_c.results.filter(position=1, rank=1).exists())
-        self.assertTrue(game_c.results.filter(position=2, rank=2).exists())
-        self.assertTrue(game_c.results.filter(position=3, rank=3).exists())
-        self.assertTrue(game_c.results.filter(position=4, rank=4).exists())
-        self.assertTrue(game_d.results.filter(position=1, rank=5).exists())
-        self.assertTrue(game_d.results.filter(position=2, rank=6).exists())
-        self.assertTrue(game_d.results.filter(position=3, rank=7).exists())
-        self.assertTrue(game_d.results.filter(position=4, rank=8).exists())
+        self.assertTrue(game_c.players_out.filter(position=1, rank=1).exists())
+        self.assertTrue(game_c.players_out.filter(position=2, rank=2).exists())
+        self.assertTrue(game_c.players_out.filter(position=3, rank=3).exists())
+        self.assertTrue(game_c.players_out.filter(position=4, rank=4).exists())
+        self.assertTrue(game_d.players_out.filter(position=1, rank=5).exists())
+        self.assertTrue(game_d.players_out.filter(position=2, rank=6).exists())
+        self.assertTrue(game_d.players_out.filter(position=3, rank=7).exists())
+        self.assertTrue(game_d.players_out.filter(position=4, rank=8).exists())

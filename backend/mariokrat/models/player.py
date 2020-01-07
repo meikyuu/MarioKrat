@@ -7,4 +7,5 @@ class Player(models.Model):
         'Tournament', on_delete=models.CASCADE,
         related_name='players',
     )
+    number = models.IntegerField()
     name = models.TextField()

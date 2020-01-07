@@ -6,7 +6,7 @@ VOLUME /app/media
 COPY backend /app/src
 WORKDIR /app/src
 
-RUN pip install -qUr requirements.txt && rm requirements.txt
+RUN pip install -qUr requirements.txt
 
 EXPOSE 8000/tcp
 

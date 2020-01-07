@@ -15,6 +15,7 @@ class Migration(migrations.Migration):
             name='Player',
             fields=[
                 ('id', models.AutoField(auto_created=True, primary_key=True, serialize=False, verbose_name='ID')),
+                ('number', models.IntegerField()),
                 ('name', models.TextField()),
                 ('tournament', models.ForeignKey(on_delete=django.db.models.deletion.CASCADE, related_name='players', to='mariokrat.Tournament')),
             ],

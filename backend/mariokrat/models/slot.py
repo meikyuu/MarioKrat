@@ -11,7 +11,7 @@ class Slot(models.Model):
     source = models.ForeignKey(
         'Game', on_delete=models.PROTECT,
         blank=True, null=True,
-        related_name='results',
+        related_name='players_out',
     )
     position = models.IntegerField(blank=True, null=True)
 
@@ -24,6 +24,6 @@ class Slot(models.Model):
     target = models.ForeignKey(
         'Game', on_delete=models.PROTECT,
         blank=True, null=True,
-        related_name='participants',
+        related_name='players_in',
     )
     rank = models.IntegerField(blank=True, null=True)
