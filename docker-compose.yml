@@ -20,6 +20,7 @@ services:
       dockerfile: docker/dev/frontend/Dockerfile
     volumes:
       - ./frontend/src:/app/src
+      - ./frontend/public:/app/public
 
   web:
     build: docker/dev/web

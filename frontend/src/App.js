@@ -1,26 +1,52 @@
 import React from 'react';
-import logo from './logo.svg';
-import './App.css';
+import { BrowserRouter, Switch, Route } from 'react-router-dom';
+import Loadable from 'react-loadable';
+import Scrollbars from 'react-custom-scrollbars';
+import styled from 'styled-components';
+import theme from './theme';
+
+function Loading() {
+    return 'Loading...';
+}
+
+function screen(path) {
+    return Loadable({
+        loader() {
+            return import(`./screen/${path}`);
+        },
+        loading: Loading,
+        delay: 300,
+    });
+}
+
+const Home = screen('Home');
+const Tournament = screen('Tournament');
+
+const Container = styled.div`
+    height: 100%;
+    background-color: ${theme.bgColor};
+    color: ${theme.textColor};
+`;
+
+const Wrapper = styled.div`
+    padding: 1rem;
+`;
 
 function App() {
-  return (
-    <div className="App">
-      <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.js</code> and save to reload.
-        </p>
-        <a
-          className="App-link"
-          href="https://reactjs.org"
-          target="_blank"
-          rel="noopener noreferrer"
-        >
-          Learn React
-        </a>
-      </header>
-    </div>
-  );
+    return (
+        <Container>
+            <Scrollbars>
+                <Wrapper>
+                    <BrowserRouter>
+                        <Switch>
+                            <Route exact path="/" render={(props) => <Home {...props} />} />
+                            <Route path="/t/:token?" render={(props) => <Tournament {...props} />} />
+                        </Switch>
+                    </BrowserRouter>
+                </Wrapper>
+            </Scrollbars>
+        </Container>
+    );
 }
 
 export default App;

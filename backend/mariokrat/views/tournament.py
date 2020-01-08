@@ -1,13 +1,12 @@
 from django.db.models import Q
 from django.http import JsonResponse
-from django.urls import reverse
 
 from main.views import not_found_view
 from utils.views import allow_methods, validate_body
 from ..models import Tournament, Player
 from ..schedule import schedule
 
-from is_valid import is_str, is_list_of
+from is_valid import is_str, is_list_of, is_pre, is_not_blank
 
 
 def tournament_data(tournament, include_admin_token=False):
@@ -65,9 +64,9 @@ def tournament_view(request, token=None):
 
 @allow_methods('POST')
 @validate_body({
-    'name': is_str,
+    'name': is_pre(is_str, is_not_blank),
     'players': is_list_of({
-        'name': is_str,
+        'name': is_pre(is_str, is_not_blank),
     }),
 })
 def tournament_list(request, data):
