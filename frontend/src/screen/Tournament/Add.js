@@ -33,7 +33,7 @@ export default function AddTournament() {
                     <Input
                         placeholder="Naam"
                         value={name}
-                        onChange={(e) => setName(e.target.value)}
+                        onChange={setName}
                     />
                 </Group>
                 <Group label="Spelers" innerRef={playersRef}>
@@ -43,9 +43,9 @@ export default function AddTournament() {
                             autoFocus={i === 0}
                             placeholder={`Speler ${i + 1}`}
                             value={player.name}
-                            onChange={(e) => setPlayers([
+                            onChange={(name) => setPlayers([
                                 ...players.slice(0, i),
-                                { ...player, name: e.target.value },
+                                { ...player, name },
                                 ...players.slice(i + 1),
                             ])}
                             onDelete={players.length <= 2 ? undefined : () => setPlayers([

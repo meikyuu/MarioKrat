@@ -12,10 +12,9 @@ const StyledInput = styled.input`
     border: unset;
     font-size: 1rem;
     font-weight: bold;
-    padding: 0.5rem;
+    padding: 0.5rem ${({ buttons }) => 0.5 + 1.5 * buttons}rem 0.5rem 0.5rem;
     text-align: center;
     border-radius: 0.5rem;
-    cursor: pointer;
     &:active, &:focus {
         outline: unset;
         background-color: ${theme.bgColorP2};
@@ -32,10 +31,10 @@ const Container = styled.div`
     }
 `;
 
-const DeleteIcon = styled(Icon)`
+const IconButton = styled(Icon)`
     position: absolute;
     top: 50%;
-    right: 0.5rem;
+    right: ${({ offset = 0 }) => 0.5 + 1.5 * offset}rem;
     transform: translateY(-50%);
 
     ${({ onClick }) => onClick ? `
@@ -52,11 +51,30 @@ const DeleteIcon = styled(Icon)`
     transition: opacity 300ms ease, color 300ms ease;
 `;
 
-export default function Input({ onDelete, ...props }) {
+export default function Input({
+    onDelete,
+    value = '',
+    onChange = () => {},
+    copy = false,
+    ...props
+}) {
     return (
         <Container>
-            <StyledInput {...props} />
-            <DeleteIcon name="trash-alt" onClick={onDelete} />
+            <StyledInput
+                value={value}
+                onChange={(e) => onChange(e.target.value)}
+                buttons={(copy ? 1 : 0) + (onDelete ? 1 : 0)}
+                {...props}
+            />
+            <IconButton
+                name="copy"
+                onClick={copy ? () => navigator.clipboard.writeText(value) : undefined}
+                offset={onDelete ? 1 : 0}
+            />
+            <IconButton
+                name="trash-alt"
+                onClick={onDelete}
+            />
         </Container>
     );
 }
