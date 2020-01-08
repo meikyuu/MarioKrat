@@ -22,8 +22,8 @@ export default function AddTournament() {
                 e.preventDefault();
 
                 api.post('tournament/', { name, players })
-                    .then(({ data: { token } }) => {
-                        history.push(`/t/${token}`);
+                    .then(({ data: { admin_token } }) => {
+                        history.push(`/t/${admin_token}`);
                     })
                     .catch((res) => {
                         // TODO show errors
