@@ -45,6 +45,12 @@ def schedule(tournament, shuffle=True):
     while to_schedule:
         slots = to_schedule.popleft()
 
+        # If we somehow only got 1 slot thats by definition a rank
+        if len(slots) == 1:
+            slots[0].rank = next_rank
+            next_rank += 1
+            continue
+
         # Create games
         games = []
         for _ in range(math.ceil(len(slots) / 4)):
@@ -75,13 +81,22 @@ def schedule(tournament, shuffle=True):
             # We group the new slots by rank
             new_slots = defaultdict(list)
             for game in games:
-                for pos in range(1, game.players_in.count() + 1):
-                    new_slots[pos].append(Slot.objects.create(
+                players = game.players_in.count()
+                for pos in range(1, players + 1):
+                    rel_pos = (pos - 1) / (players - 1)
+                    new_slots[rel_pos].append(Slot.objects.create(
                         tournament=tournament,
                         source=game,
                         position=pos,
                     ))
-            # Schedule all the 1st and 2nd together
-            to_schedule.append(new_slots[1] + new_slots[2])
-            # Schedule all the 3rd and 4th together
-            to_schedule.append(new_slots[3] + new_slots[4])
+            # Divide into top half and bottom half
+            top_half = []
+            bottom_half = []
+            for key in sorted(new_slots):
+                if key <= 0.5:
+                    top_half.extend(new_slots[key])
+                else:
+                    bottom_half.extend(new_slots[key])
+            # Schedule halfs
+            to_schedule.append(top_half)
+            to_schedule.append(bottom_half)
