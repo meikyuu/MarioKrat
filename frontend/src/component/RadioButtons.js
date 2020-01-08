@@ -32,7 +32,8 @@ const Button = styled.div`
     position: relative;
 
     cursor: pointer;
-    padding: 0.75rem;
+    margin: 0.25rem;
+    padding: 0.5rem;
     outline: none;
     background-color: transparent;
     color: ${({ active }) => active ? theme.textColorP1 : theme.textColorN2};
