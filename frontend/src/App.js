@@ -4,6 +4,7 @@ import Loadable from 'react-loadable';
 import Scrollbars from 'react-custom-scrollbars';
 import styled from 'styled-components';
 import theme from './theme';
+import Loader from 'component/Loader';
 
 function Loading() {
     return 'Loading...';
@@ -14,7 +15,7 @@ function screen(path) {
         loader() {
             return import(`./screen/${path}`);
         },
-        loading: Loading,
+        loading: Loader,
         delay: 300,
     });
 }
