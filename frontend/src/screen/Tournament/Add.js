@@ -1,10 +1,10 @@
 import React, { useState, useRef } from 'react';
 import { useHistory } from 'react-router-dom';
-import Input from '../component/Input';
-import Button from '../component/Button';
-import Group from '../component/Group';
-import Form from '../component/Form';
-import api from '../api';
+import Input from '../../component/Input';
+import Button from '../../component/Button';
+import Group from '../../component/Group';
+import Form from '../../component/Form';
+import api from '../../api';
 
 export default function AddTournament() {
     const [name, setName] = useState('MarioKrat');

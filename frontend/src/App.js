@@ -6,22 +6,18 @@ import styled from 'styled-components';
 import theme from './theme';
 import Loader from './component/Loader';
 
-function Loading() {
-    return 'Loading...';
-}
-
-function screen(path) {
+function route(path) {
     return Loadable({
         loader() {
-            return import(`./screen/${path}`);
+            return import(`./route/${path}`);
         },
         loading: Loader,
         delay: 300,
     });
 }
 
-const Home = screen('Home');
-const Tournament = screen('Tournament');
+const Home = route('Home');
+const Tournament = route('Tournament');
 
 const Container = styled.div`
     height: 100%;
