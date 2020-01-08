@@ -52,12 +52,13 @@ const Rank = styled.div`
     position: relative;
 `;
 
-const CornerIcon = styled(Icon)`
+const TrophyIcon = styled(Icon)`
     position: absolute;
     margin: 0 !important;
-    top: 0.75rem;
-    right: 0.75rem;
+    top: 1rem;
+    left: 50%;
     font-size: 1.25rem;
+    transform: translateX(-50%);
 `;
 
 const trophyColors = {
@@ -150,7 +151,7 @@ export default function ViewTournament({ token }) {
                 {tournament.ranks.map((rank, i) => (
                     <Rank key={i}>
                         {trophyColors[rank.rank] && (
-                            <CornerIcon
+                            <TrophyIcon
                                 name="trophy"
                                 color={trophyColors[rank.rank]}
                             />
