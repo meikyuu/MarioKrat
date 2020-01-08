@@ -3,27 +3,23 @@ version: '3.6'
 services:
 
   db:
-    build: docker/dev/db
+    build: db
 
   backend:
-    build:
-      context: .
-      dockerfile: docker/dev/backend/Dockerfile
+    build: backend
     volumes:
       - ./backend:/app/src
     depends_on:
       - db
 
   frontend:
-    build:
-      context: .
-      dockerfile: docker/dev/frontend/Dockerfile
+    build: frontend
     volumes:
       - ./frontend/src:/app/src
       - ./frontend/public:/app/public
 
   web:
-    build: docker/dev/web
+    build: web
     depends_on:
       - backend
       - frontend

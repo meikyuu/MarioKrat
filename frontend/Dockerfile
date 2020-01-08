@@ -3,11 +3,11 @@ FROM node:13.5
 RUN mkdir app
 WORKDIR app
 
-COPY frontend/package.json .
+COPY package.json .
 RUN yarn
 
-COPY frontend/src src
-COPY frontend/public public
+COPY src src
+COPY public public
 
 EXPOSE 3000/tcp
 

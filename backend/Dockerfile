@@ -3,7 +3,7 @@ FROM python:3.7-buster
 RUN mkdir -p /app/media
 VOLUME /app/media
 
-COPY backend /app/src
+COPY . /app/src
 WORKDIR /app/src
 
 RUN pip install -qUr requirements.txt
