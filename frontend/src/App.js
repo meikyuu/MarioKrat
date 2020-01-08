@@ -4,7 +4,7 @@ import Loadable from 'react-loadable';
 import Scrollbars from 'react-custom-scrollbars';
 import styled from 'styled-components';
 import theme from './theme';
-import Loader from 'component/Loader';
+import Loader from './component/Loader';
 
 function Loading() {
     return 'Loading...';

@@ -1,4 +1,5 @@
 import React from 'react';
+import styled from 'styled-components';
 
 const styles = {
     solid: 'fas',
@@ -7,6 +8,12 @@ const styles = {
     duotone: 'fad',
     brands: 'fab',
 };
+
+const StyledIcon = styled(({ color, ...props }) => <i {...props} />)`
+    ${({ color }) => color ? `
+        color: ${color};
+    ` : ``}
+`;
 
 export default function Icon({
     name,
@@ -20,5 +27,5 @@ export default function Icon({
         classNames.push(className);
     }
 
-    return <i className={classNames.join(' ')} {...props} />;
+    return <StyledIcon className={classNames.join(' ')} {...props} />;
 }
