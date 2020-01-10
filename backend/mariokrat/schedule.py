@@ -1,9 +1,9 @@
 import math
 import random
 from collections import deque, defaultdict
-from itertools import cycle
+from itertools import cycle, product
 
-from .models import Game, Slot
+from .models import Game, Race, Slot
 
 
 def get_next_name(name):
@@ -53,11 +53,18 @@ def schedule(tournament, shuffle=True):
 
         # Create games
         games = []
-        for _ in range(math.ceil(len(slots) / 4)):
-            games.append(Game.objects.create(
+        for _ in range(math.ceil(len(slots) / tournament.game_size)):
+            game = Game.objects.create(
                 tournament=tournament,
                 name=next_name,
-            ))
+            )
+            for cup, race in product(
+                range(1, tournament.game_cups + 1),
+                range(1, tournament.game_races + 1),
+            ):
+                Race.objects.create(game=game, cup=cup, race=race)
+
+            games.append(game)
             next_name = get_next_name(next_name)
 
         # Add players in to games

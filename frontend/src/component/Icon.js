@@ -1,7 +1,7 @@
 import React from 'react';
 import styled from 'styled-components';
 
-const styles = {
+const sets = {
     solid: 'fas',
     regular: 'far',
     light: 'fal',
@@ -18,10 +18,10 @@ const StyledIcon = styled(({ color, ...props }) => <i {...props} />)`
 export default function Icon({
     name,
     className,
-    style = 'solid',
+    set = 'solid',
     ...props
 }) {
-    const classNames = [styles[style], `fa-${name}`];
+    const classNames = [sets[set], `fa-${name}`];
 
     if (className) {
         classNames.push(className);

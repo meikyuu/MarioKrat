@@ -1,7 +1,9 @@
 from .game import Game
 from .player import Player
+from .race import Race
+from .result import Result
 from .slot import Slot
 from .tournament import Tournament
 
 
-__all__ = [Game, Player, Slot, Tournament]
+__all__ = [Game, Player, Race, Result, Slot, Tournament]

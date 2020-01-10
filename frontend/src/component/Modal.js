@@ -38,7 +38,7 @@ const InnerContainer = styled.div`
     background-color: ${theme.bgColor};
     border-radius: 0.5rem;
     box-shadow: 0 1rem 3rem rgba(0, 0, 0, 0.25);
-    padding: 2rem;
+    padding: 1rem;
 
     ${({ open }) => open ? `
         opacity: 1;
@@ -49,7 +49,7 @@ const InnerContainer = styled.div`
     transition: opacity 600ms ease, transform 600ms ease;
     
     h3 {
-        margin -1rem 0 1rem;
+        margin: 0 0 1rem;
         &:last-child {
             margin-bottom: 0;
         }

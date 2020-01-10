@@ -5,30 +5,19 @@ import RadioButtons from '../../../component/RadioButtons';
 import Icon from '../../../component/Icon';
 import Input from '../../../component/Input';
 import HSplit from '../../../component/HSplit';
-import { ButtonA } from '../../../component/Button';
+import Button from '../../../component/Button';
 import TournamentContext from './Context';
-
-const ButtonIcon = styled(Icon)`
-    font-size: ${({ size = '0.9em' }) => size};
-    line-height: 1;
-    position: absolute;
-    left: 0.7rem;
-    top: 50%;
-    transform: translateY(-50%);
-`;
 
 const TYPE_OPTIONS = [
     { 
         value: 'spectator',
-        content: (
-            <><ButtonIcon name="eye" /> Toeschouwer</>
-        ),
+        icon: 'eye',
+        content: 'Toeschouwer',
     },
     {
         value: 'referee',
-        content: (
-            <><ButtonIcon name="pen" /> Scheidsrechter</>
-        ),
+        icon: 'pen',
+        content: 'Scheidsrechter',
     },
 ];
 
@@ -51,20 +40,24 @@ export default function ShareModal(props) {
             )}
             <Input copy readonly value={url} />
             <HSplit>
-                <ButtonA
-                    color="#3880A8" hoverColor="#307090"
+                <Button
+                    as="a"
+                    color="#3880A8" hoverColor="#286078"
                     href={`mailto:?subject=${encodeURI(subject)}&body=${encodeURI(body)}`}
+                    target="_blank"
+                    icon="envelope"
                 >
-                    <ButtonIcon name="envelope" />
                     Mail
-                </ButtonA>
-                <ButtonA 
+                </Button>
+                <Button
+                    as="a"
                     color="#128C7E" hoverColor="#075E54"
-                    href={`https://wa.me/?text=${encodeURI(body)}`}
+                    href={`https://api.whatsapp.com/send?text=${encodeURI(body)}`}
+                    target="_blank"
+                    icon={{ set: 'brands', name: 'whatsapp', size: '1.1em' }}
                 >
-                    <ButtonIcon style="brands" name="whatsapp" size="1.1em" />
                     WhatsApp
-                </ButtonA>
+                </Button>
             </HSplit>
         </Modal>
     );

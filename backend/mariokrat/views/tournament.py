@@ -3,13 +3,53 @@ from django.http import JsonResponse
 
 from main.views import not_found_view
 from utils.views import allow_methods, validate_body
-from ..models import Tournament, Player
+from ..models import Tournament, Player, Result
 from ..schedule import schedule
 
 from is_valid import is_str, is_list_of, is_pre, is_not_blank
 
 
 def tournament_data(tournament, include_admin_token=False):
+    games = []
+    for game in tournament.games.order_by('name'):
+        players = list(game.players_in.order_by('position', 'id'))
+        results = {
+            (
+                result.race.cup,
+                result.race.race,
+                result.race.slot,
+            ): result.position
+            for result in Result.objects.filter(race__game=game)
+        }
+
+        games.append({
+            'name': game.name,
+            'players': [
+                {
+                    'type': 'slot',
+                    'game': slot.source.name,
+                    'position': slot.position,
+                    'player': slot.player and slot.player.number,
+                }
+                if slot.source else
+                {
+                    'type': 'player',
+                    'player': slot.player.number,
+                }
+                for slot in players
+            ],
+            'results': [
+                [
+                    [
+                        results.get((cup, race, player))
+                        for player in players
+                    ]
+                    for race in range(tournament.game_races)
+                ]
+                for cup in range(tournament.game_cups)
+            ],
+        })
+
     data = {
         'token': tournament.spectator_token,
         'name': tournament.name,
@@ -20,26 +60,7 @@ def tournament_data(tournament, include_admin_token=False):
             }
             for player in tournament.players.order_by('number')
         ],
-        'games': [
-            {
-                'name': game.name,
-                'players': [
-                    {
-                        'type': 'slot',
-                        'game': slot.source.name,
-                        'position': slot.position,
-                        'player': slot.player and slot.player.number,
-                    }
-                    if slot.source else
-                    {
-                        'type': 'player',
-                        'player': slot.player.number,
-                    }
-                    for slot in game.players_in.order_by('id')
-                ],
-            }
-            for game in tournament.games.order_by('name')
-        ],
+        'games': games,
         'ranks': [
             {
                 'rank': slot.rank,

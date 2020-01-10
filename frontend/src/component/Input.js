@@ -2,6 +2,7 @@ import React from 'react';
 import styled from 'styled-components';
 import theme from '../theme';
 import Icon from './Icon';
+import copyToClipboard from '../helpers/copyToClipboard';
 
 const StyledInput = styled.input`
     display: block;
@@ -68,7 +69,7 @@ export default function Input({
             />
             <IconButton
                 name="copy"
-                onClick={copy ? () => navigator.clipboard.writeText(value) : undefined}
+                onClick={copy ? () => copyToClipboard(value) : undefined}
                 offset={onDelete ? 1 : 0}
             />
             <IconButton

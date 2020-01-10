@@ -1,9 +1,8 @@
 from django.test import TestCase, Client
 
-from ..models import Tournament
-
 from is_valid import (
     is_decodable_json_where, is_str, is_list_of, is_dict_union, is_int, is_in,
+    is_nullable,
 )
 from is_valid.test import assert_valid
 
@@ -47,6 +46,13 @@ class TestTournament(TestCase):
                         'player': None,
                     },
                 )),
+                'results': is_list_of(
+                    is_list_of(
+                        is_list_of(
+                            is_nullable(is_int)
+                        )
+                    )
+                ),
             }),
             'ranks': is_list_of({
                 'rank': is_in({1, 2, 3, 4, 5, 6, 7, 8}),

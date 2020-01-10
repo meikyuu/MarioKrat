@@ -1,6 +1,7 @@
 import React from 'react';
 import theme from '../theme';
 import styled from 'styled-components';
+import { ButtonIcon } from './Button';
 
 const Container = styled.div`
     margin-bottom: 1rem;
@@ -27,13 +28,14 @@ const Highlight = styled.div`
     transition: left 300ms ease;
 `;
 
-const Button = styled.div`
+const Button = styled.button`
     flex: 1 1 0;
     position: relative;
 
     cursor: pointer;
     margin: 0.25rem;
-    padding: 0.5rem;
+    padding: 0.5rem 0.5rem 0.5rem ${({ icon }) => icon ? 2 : 0.5}rem;
+    border: none;
     outline: none;
     background-color: transparent;
     color: ${({ active }) => active ? theme.textColorP1 : theme.textColorN2};
@@ -50,15 +52,22 @@ export default function RadioButtons({ value, onChange, options }) {
             {active !== -1 && (
                 <Highlight active={active} options={options.length} />
             )}
-            {options.map(({ value, content }, i) => (
-                <Button
-                    key={i}
-                    active={i === active}
-                    onClick={() => onChange(value)}
-                >
-                    {content}
-                </Button>
-            ))}
+            {options.map(({ value, content, icon }, i) => {
+                if (typeof icon === 'string') {
+                    icon = { name: icon };
+                }
+                return (
+                    <Button
+                        key={i}
+                        active={i === active}
+                        icon={!!icon}
+                        onClick={() => onChange(value)}
+                    >
+                        {icon && <ButtonIcon {...icon} />}
+                        {content}
+                    </Button>
+                );
+            })}
         </Container>
     );
 }
