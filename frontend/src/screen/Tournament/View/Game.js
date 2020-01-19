@@ -1,8 +1,9 @@
-import React from 'react';
+import React, { useContext } from 'react';
 import styled from 'styled-components';
 import theme from '../../../theme';
-import Slot from './Slot';
 import range from '../../../helpers/range';
+import Slot from './Slot';
+import TournamentContext from './Context';
 
 const Container = styled.div`
     border-radius: 0.5rem;
@@ -10,18 +11,30 @@ const Container = styled.div`
     overflow: hidden;
 `;
 
+const HEADER_BG_COLOR = {
+    waiting: theme.bgColorP2,
+    active: theme.primaryColor,
+    done: theme.bgColorN1,
+};
+
+const HEADER_FG_COLOR = {
+    waiting: theme.textColorP1,
+    active: theme.textColorP2,
+    done: theme.textColorN2,
+};
+
 const Header = styled.div`
     text-align: center;
     font-weight: bold;
-    color: ${theme.textColorP1};
-    background-color: ${theme.bgColorP2};
+    color: ${({ state }) => HEADER_FG_COLOR[state]};
+    background-color: ${({ state }) => HEADER_BG_COLOR[state]};
     padding: 0.25rem;
 `;
 
 const Content = styled.div`
     display: flex;
     flex-direction: column;
-    @media only screen and (min-width: 768px) {
+    @media only screen and (min-width: 600px) {
         /* Desktop */
         flex-direction: row;
     }
@@ -37,7 +50,7 @@ const Table = styled.div`
     &:last-child {
         margin-bottom: 0;
     }
-    @media only screen and (min-width: 768px) {
+    @media only screen and (min-width: 600px) {
         /* Desktop */
         flex: 1 1 auto;
         margin-bottom: 0;
@@ -59,12 +72,15 @@ const Total = styled(Table)`
 const Cell = styled.div`
     grid-column: ${({ x }) => x + 1} / span ${({ width = 1 }) => width};
     grid-row: ${({ y }) => y + 1} / span ${({ height = 1 }) => height};
-    text-align: center;
+    text-align: ${({ textAlign = 'center' }) => textAlign};
+    ${({ active }) => active ? `
+        pointer-events: none;
+    ` : ``}
 `;
 
 const HeaderCell = styled(Cell)`
-    background-color: ${theme.bgColor};
-    color: ${theme.textColorN2};
+    background-color: ${({ active }) => active ? theme.primaryColor : theme.bgColor};
+    color: ${({ active }) => active ? theme.textColorP2 : theme.textColorN2};
     font-weight: bold;
     font-size: 0.6em;
     padding: 0.1rem 0rem;
@@ -73,7 +89,17 @@ const HeaderCell = styled(Cell)`
     text-align: center;
 `;
 
+const ActiveCell = styled(Cell)`
+    background-color: ${theme.bgColorP2};
+    cursor: pointer;
+    padding: 0.1rem 0rem;
+    margin: 0 -0.1rem;
+    border-radius: 0.2rem;
+`;
+
 export default function Game({ game }) {
+    const { next_race } = useContext(TournamentContext);
+
     const cups = game.cups.map((cup, i) => {
         const baseY = game.cups.length > 1 ? 2 : 1;
         const races = Math.max(0, ...cup.map(({ races }) => races.length));
@@ -86,20 +112,43 @@ export default function Game({ game }) {
                 )}
                 <HeaderCell x={0} y={baseY - 1}>#</HeaderCell>
                 <HeaderCell x={1} y={baseY - 1}>Speler</HeaderCell>
-                {range(races).map((i) => (
-                    <HeaderCell key={i} x={2 + i} y={baseY - 1}>R{i + 1}</HeaderCell>
+                {range(races).map((j) => (
+                    <HeaderCell
+                        key={j}
+                        x={2 + j}
+                        y={baseY - 1}
+                        active={
+                            next_race.game === game.name &&
+                            next_race.cup === i &&
+                            next_race.race === j
+                        }
+                    >
+                        R{j + 1}
+                    </HeaderCell>
                 ))}
                 <HeaderCell x={2 + races} y={baseY - 1}>Score</HeaderCell>
+                {next_race.game === game.name && next_race.cup === i && (
+                    <ActiveCell x={2 + next_race.race} y={baseY} height={game.players.length} />
+                )}
                 {cup.map((score, y) => (
                     <React.Fragment key={y}>
                         <Cell x={0} y={baseY + y}>
                             {score.rank}
                         </Cell>
-                        <Cell x={1} y={baseY + y}>
+                        <Cell x={1} y={baseY + y} textAlign="left">
                             <Slot slot={game.players[score.player]} />
                         </Cell>
-                        {score.races.map((position, i) => (
-                            <Cell key={i} x={2 + i} y={baseY + y}>
+                        {score.races.map((position, j) => (
+                            <Cell
+                                key={j}
+                                x={2 + j}
+                                y={baseY + y}
+                                active={
+                                    next_race.game === game.name &&
+                                    next_race.cup === i &&
+                                    next_race.race === j
+                                }
+                            >
                                 {position || '-'}
                             </Cell>
                         ))}
@@ -116,7 +165,7 @@ export default function Game({ game }) {
         cups.push(
             <Total key="total">
                 <HeaderCell x={0} y={0} width={3}>
-                    Totaal
+                    Eindklassement
                 </HeaderCell>
                 <HeaderCell x={0} y={1}>#</HeaderCell>
                 <HeaderCell x={1} y={1}>Speler</HeaderCell>
@@ -126,7 +175,7 @@ export default function Game({ game }) {
                         <Cell x={0} y={y + 2}>
                             {score.rank}
                         </Cell>
-                        <Cell x={1} y={y + 2}>
+                        <Cell x={1} y={y + 2} textAlign="left">
                             <Slot slot={game.players[score.player]} />
                         </Cell>
                         <Cell x={2} y={y + 2}>
@@ -140,7 +189,7 @@ export default function Game({ game }) {
 
     return (
         <Container>
-            <Header>Groep {game.name}</Header>
+            <Header state={game.state}>Groep {game.name}</Header>
             <Content>{cups}</Content>
         </Container>
     );

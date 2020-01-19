@@ -61,6 +61,11 @@ class TestTournament(TestCase):
                     'rank': is_in({1, 2, 3, 4}),
                 }),
             }),
+            'next_race': is_nullable({
+                'game': is_str,
+                'cup': is_int,
+                'race': is_int,
+            }),
             'ranks': is_list_of({
                 'rank': is_in({1, 2, 3, 4, 5, 6, 7, 8}),
                 'game': is_str,

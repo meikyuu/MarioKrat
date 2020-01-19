@@ -38,21 +38,24 @@ def add_ranks(scores, allow_equal=True):
 
 
 def tournament_data(tournament, include_admin_token=False):
+    next_race = None
     games = []
+
     for game in tournament.games.order_by('name'):
         players = list(game.players_in.order_by('position', 'id'))
 
         game_done = True
+        active = all(slot.player is not None for slot in players)
         cups = []
         total = [{'player': i, 'points': 0} for i in range(len(players))]
 
-        for cup in game.cups.order_by('number'):
+        for i, cup in enumerate(game.cups.order_by('number')):
             cup_done = True
             scores = [
                 {'player': i, 'races': [], 'points': 0}
                 for i in range(len(players))
             ]
-            for race in cup.races.order_by('number'):
+            for j, race in enumerate(cup.races.order_by('number')):
                 for score in scores:
                     score['races'].append(None)
                 for result in race.results.all():
@@ -62,6 +65,12 @@ def tournament_data(tournament, include_admin_token=False):
                 if any(score['races'][-1] is None for score in scores):
                     game_done = False
                     cup_done = False
+                    if active and (next_race is None or i < next_race['cup']):
+                        next_race = {
+                            'game': game.name,
+                            'cup': i,
+                            'race': j,
+                        }
             # If there is only one cup we do not allow ending on the same
             # position because we need clear rankings from that cup, otherwise
             # this is handled in the total rank
@@ -81,11 +90,7 @@ def tournament_data(tournament, include_admin_token=False):
         games.append({
             'name': game.name,
             'state': (
-                'done'
-                if game_done else
-                'waiting'
-                if any(slot.player is None for slot in players) else
-                'active'
+                'done' if game_done else 'active' if active else 'waiting'
             ),
             'players': [
                 {
@@ -125,6 +130,7 @@ def tournament_data(tournament, include_admin_token=False):
             }
             for slot in tournament.slots.exclude(rank=None).order_by('rank')
         ],
+        'next_race': next_race,
     }
     if include_admin_token:
         data['admin_token'] = tournament.admin_token

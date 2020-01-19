@@ -24,7 +24,7 @@ const GridContainer = styled.div`
     display: grid;
 
     grid-template-columns: 1fr;
-    @media only screen and (min-width: 768px) {
+    @media only screen and (min-width: 1200px) {
         /* Desktop */
         grid-template-columns: repeat(${({ children, maxWidth }) => Math.min(children.length, maxWidth)}, 1fr);
     }
