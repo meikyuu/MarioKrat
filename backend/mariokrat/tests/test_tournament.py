@@ -36,6 +36,7 @@ class TestTournament(TestCase):
             }),
             'games': is_list_of({
                 'name': is_str,
+                'state': is_in({'waiting', 'active', 'done'}),
                 'players': is_list_of(is_dict_union(
                     player={
                         'player': is_int,
@@ -46,13 +47,19 @@ class TestTournament(TestCase):
                         'player': None,
                     },
                 )),
-                'results': is_list_of(
-                    is_list_of(
-                        is_list_of(
-                            is_nullable(is_int)
-                        )
-                    )
+                'cups': is_list_of(
+                    is_list_of({
+                        'player': is_int,
+                        'races': is_list_of(is_nullable(is_int)),
+                        'points': is_int,
+                        'rank': is_in({1, 2, 3, 4}),
+                    }),
                 ),
+                'total': is_list_of({
+                    'player': is_int,
+                    'points': is_int,
+                    'rank': is_in({1, 2, 3, 4}),
+                }),
             }),
             'ranks': is_list_of({
                 'rank': is_in({1, 2, 3, 4, 5, 6, 7, 8}),

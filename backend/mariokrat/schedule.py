@@ -3,7 +3,7 @@ import random
 from collections import deque, defaultdict
 from itertools import cycle, product
 
-from .models import Game, Race, Slot
+from .models import Game, Cup, Race, Slot
 
 
 def get_next_name(name):
@@ -58,11 +58,10 @@ def schedule(tournament, shuffle=True):
                 tournament=tournament,
                 name=next_name,
             )
-            for cup, race in product(
-                range(1, tournament.game_cups + 1),
-                range(1, tournament.game_races + 1),
-            ):
-                Race.objects.create(game=game, cup=cup, race=race)
+            for cup_number in range(1, tournament.game_cups + 1):
+                cup = Cup.objects.create(game=game, number=cup_number)
+                for race_number in range(1, tournament.game_races + 1):
+                    Race.objects.create(cup=cup, number=race_number)
 
             games.append(game)
             next_name = get_next_name(next_name)
