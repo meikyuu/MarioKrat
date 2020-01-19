@@ -1,8 +1,6 @@
 import React, { useState, useContext } from 'react';
-import styled from 'styled-components';
 import Modal from '../../../component/Modal';
 import RadioButtons from '../../../component/RadioButtons';
-import Icon from '../../../component/Icon';
 import Input from '../../../component/Input';
 import HSplit from '../../../component/HSplit';
 import Button from '../../../component/Button';

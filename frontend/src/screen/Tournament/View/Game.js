@@ -74,7 +74,6 @@ const HeaderCell = styled(Cell)`
 `;
 
 export default function Game({ game }) {
-    const scores = game.players.map(() => 0);
     const cups = game.cups.map((cup, i) => {
         const baseY = game.cups.length > 1 ? 2 : 1;
         const races = Math.max(0, ...cup.map(({ races }) => races.length));
