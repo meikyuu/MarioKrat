@@ -1,12 +1,16 @@
-from django.db.models import Q
+from django.db.models import Q, Count
 from django.http import JsonResponse
 
 from main.views import not_found_view
 from utils.views import allow_methods, validate_body
-from ..models import Tournament, Player
+from ..models import Tournament, Player, Race, Result
 from ..schedule import schedule
+from ..diff import diff
 
-from is_valid import is_str, is_list_of, is_pre, is_not_blank
+from is_valid import (
+    is_str, is_list_of, is_pre, is_not_blank, is_decodable_json_where, is_int,
+    is_in_range, is_dict_union,
+)
 
 
 POINTS = {
@@ -26,7 +30,7 @@ POINTS = {
 
 
 def add_ranks(scores, allow_equal=True):
-    scores.sort(key=lambda score: score['points'])
+    scores.sort(key=lambda score: score['points'], reverse=True)
     for i, score in enumerate(scores):
         while (
             allow_equal and
@@ -49,27 +53,30 @@ def tournament_data(tournament, include_admin_token=False):
         cups = []
         total = [{'player': i, 'points': 0} for i in range(len(players))]
 
-        for i, cup in enumerate(game.cups.order_by('number')):
+        for cup in game.cups.order_by('number'):
             cup_done = True
             scores = [
                 {'player': i, 'races': [], 'points': 0}
                 for i in range(len(players))
             ]
-            for j, race in enumerate(cup.races.order_by('number')):
+            for race in cup.races.order_by('number'):
                 for score in scores:
                     score['races'].append(None)
                 for result in race.results.all():
                     player = players.index(result.slot)
-                    scores[player]['races'][-1] = POINTS[result.position]
+                    scores[player]['races'][-1] = result.position
                     scores[player]['points'] += POINTS[result.position]
                 if any(score['races'][-1] is None for score in scores):
                     game_done = False
                     cup_done = False
-                    if active and (next_race is None or i < next_race['cup']):
+                    if active and (
+                        next_race is None or
+                        cup.number < next_race['cup']
+                    ):
                         next_race = {
                             'game': game.name,
-                            'cup': i,
-                            'race': j,
+                            'cup': cup.number,
+                            'race': race.number,
                         }
             # If there is only one cup we do not allow ending on the same
             # position because we need clear rankings from that cup, otherwise
@@ -77,12 +84,13 @@ def tournament_data(tournament, include_admin_token=False):
             add_ranks(scores, game.cups.count() != 1)
             cups.append(scores)
 
+            for score in scores:
+                total[score['player']]['points'] += score['points']
             if cup_done:
                 for score in scores:
                     total[score['player']]['points'] += (
                         (len(players) - score['rank']) *
-                        (POINTS[1] * cup.races.count()) +
-                        score['points']
+                        (POINTS[1] * cup.races.count())
                     )
 
         add_ranks(total, False)
@@ -165,7 +173,7 @@ def tournament_list(request, data):
     return JsonResponse(tournament_data(tournament, True))
 
 
-@allow_methods('GET')
+@allow_methods('GET', 'POST')
 def tournament_detail(request, token):
     try:
         tournament = Tournament.objects.get(
@@ -177,4 +185,89 @@ def tournament_detail(request, token):
 
     is_admin = token == tournament.admin_token
 
-    return JsonResponse(tournament_data(tournament, is_admin))
+    data = tournament_data(tournament, is_admin)
+
+    if request.method == 'POST':
+        if not is_admin:
+            return JsonResponse(
+                status=405,
+                data={
+                    'code': 'MethodNotAllowed',
+                    'message': 'Method not allowed.',
+                },
+            )
+
+        game_preds = {}
+        for game in tournament.games.exclude(players_in__player__isnull=True):
+            race = (
+                Race.objects
+                .annotate(result_count=Count('results'))
+                .filter(cup__game=game, result_count=0)
+                .order_by('cup__number', 'number')
+                .first()
+            )
+
+            if race:
+                game_preds[game.name] = {
+                    'cup': race.cup.number,
+                    'race': race.number,
+                    'positions': [
+                        is_pre(is_int, is_in_range(1, 12, stop_in=True))
+                        for _ in range(game.players_in.count())
+                    ],
+                }
+
+        is_result = is_decodable_json_where(is_dict_union('game', game_preds))
+
+        valid = is_result.explain(request.body)
+        if not valid:
+            return JsonResponse(
+                status=400,
+                data={
+                    'code': 'BadRequest',
+                    'message': 'Request body is not valid.',
+                    'details': valid.dict(),
+                },
+            )
+
+        race = Race.objects.get(
+            cup__game__tournament=tournament,
+            cup__game__name=valid.data['game'],
+            cup__number=valid.data['cup'],
+            number=valid.data['race'],
+        )
+        players = list(race.cup.game.players_in.order_by('position', 'id'))
+        for player, position in zip(players, valid.data['positions']):
+            Result.objects.create(
+                race=race,
+                slot=player,
+                position=position,
+            )
+
+        new_data = tournament_data(tournament, is_admin)
+
+        game_data = next(
+            game_data
+            for game_data in new_data['games']
+            if game_data['name'] == valid.data['game']
+        )
+        if all(
+            result is not None
+            for cup_data in game_data['cups']
+            for player_data in cup_data
+            for result in player_data['races']
+        ):
+            for i, slot in enumerate(
+                race.cup.game.players_out.order_by('position', 'id')
+            ):
+                slot.player = players[game_data['total'][i]['player']].player
+                slot.save()
+
+            new_data = tournament_data(tournament, is_admin)
+
+        for change in diff(data, new_data):
+            print('CHANGE', change)
+
+        data = new_data
+
+    return JsonResponse(data)

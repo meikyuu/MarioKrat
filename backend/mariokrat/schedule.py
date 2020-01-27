@@ -1,7 +1,7 @@
 import math
 import random
 from collections import deque, defaultdict
-from itertools import cycle, product
+from itertools import cycle
 
 from .models import Game, Cup, Race, Slot
 
