@@ -44,7 +44,6 @@ const Content = styled.div`
 const Table = styled.div`
     display: grid;
     grid-gap: 0.15rem 0.35rem;
-    font-size: 0.8em;
 
     margin-bottom: 0.5rem;
     &:last-child {
@@ -97,7 +96,7 @@ const ActiveCell = styled(Cell)`
     border-radius: 0.2rem;
 `;
 
-export default function Game({ game }) {
+export default function Game({ game, onClickNextRace }) {
     const { next_race } = useContext(TournamentContext);
 
     const cups = game.cups.map((cup, i) => {
@@ -119,16 +118,21 @@ export default function Game({ game }) {
                         y={baseY - 1}
                         active={
                             next_race.game === game.name &&
-                            next_race.cup === i &&
-                            next_race.race === j
+                            next_race.cup === i + 1 &&
+                            next_race.race === j + 1
                         }
                     >
                         R{j + 1}
                     </HeaderCell>
                 ))}
                 <HeaderCell x={2 + races} y={baseY - 1}>Score</HeaderCell>
-                {next_race.game === game.name && next_race.cup === i && (
-                    <ActiveCell x={2 + next_race.race} y={baseY} height={game.players.length} />
+                {next_race.game === game.name && next_race.cup === i + 1 && (
+                    <ActiveCell
+                        x={1 + next_race.race}
+                        y={baseY}
+                        height={game.players.length}
+                        onClick={onClickNextRace}
+                    />
                 )}
                 {cup.map((score, y) => (
                     <React.Fragment key={y}>
@@ -145,8 +149,8 @@ export default function Game({ game }) {
                                 y={baseY + y}
                                 active={
                                     next_race.game === game.name &&
-                                    next_race.cup === i &&
-                                    next_race.race === j
+                                    next_race.cup === i + 1 &&
+                                    next_race.race === j + 1
                                 }
                             >
                                 {position || '-'}

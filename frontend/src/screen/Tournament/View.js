@@ -8,6 +8,7 @@ import Group from '../../component/Group';
 import Game from './View/Game';
 import Slot from './View/Slot';
 import ShareModal from './View/ShareModal';
+import ResultModal from './View/ResultModal';
 import TournamentContext from './View/Context';
 
 const Container = styled.div`
@@ -89,6 +90,17 @@ const Rank = styled.div`
 export default function ViewTournament({ token }) {
     const [tournament, setTournament] = useState(null);
     const [share, setShare] = useState(false);
+    const [result, setResult] = useState(null);
+
+    const currentResult = (
+        tournament !== null &&
+        tournament.admin_token !== undefined &&
+        tournament.next_race !== null &&
+        result !== null &&
+        result.game === tournament.next_race.game &&
+        result.cup === tournament.next_race.cup &&
+        result.race === tournament.next_race.race
+    );
 
     useEffect(() => {
         api.get(`tournament/${token}/`)
@@ -140,13 +152,18 @@ export default function ViewTournament({ token }) {
 
     return (
         <TournamentContext.Provider value={tournament}>
-            <Container blur={share}>
+            <Container blur={share || currentResult}>
                 <h1>{tournament.name}</h1>
                 {rounds.map((round, i) => (
                     <Group label={`Ronde ${i + 1}`}>
                         <GridContainer key={i} maxWidth={2}>
                             {round.map((game, i) => (
-                                <Game key={i} game={game} players={tournament.players} />
+                                <Game
+                                    key={i}
+                                    game={game}
+                                    players={tournament.players}
+                                    onClickNextRace={() => setResult(tournament.next_race)}
+                                />
                             ))}
                         </GridContainer>
                     </Group>
@@ -184,6 +201,13 @@ export default function ViewTournament({ token }) {
                 open={share}
                 onClose={() => setShare(false)}
             />
+            {tournament.next_race && (
+                <ResultModal
+                    open={currentResult}
+                    onClose={() => setResult(false)}
+                    onChangeTournament={setTournament}
+                />
+            )}
         </TournamentContext.Provider>
     );
 }
