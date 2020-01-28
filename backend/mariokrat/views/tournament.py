@@ -1,6 +1,9 @@
 from django.db.models import Q, Count
 from django.http import JsonResponse
 
+from asgiref.sync import async_to_sync
+import channels.layers
+
 from main.views import not_found_view
 from utils.views import allow_methods, validate_body
 from ..models import Tournament, Player, Race, Result
@@ -265,8 +268,13 @@ def tournament_detail(request, token):
 
             new_data = tournament_data(tournament, is_admin)
 
-        for change in diff(data, new_data):
-            print('CHANGE', change)
+        changes = list(diff(data, new_data))
+        if changes:
+            channel_layer = channels.layers.get_channel_layer()
+            async_to_sync(channel_layer.group_send)(
+                f'tournament-{tournament.id}',
+                {'type': 'tournament_changes', 'changes': changes},
+            )
 
         data = new_data
 

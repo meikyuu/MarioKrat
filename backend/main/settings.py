@@ -31,10 +31,10 @@ ALLOWED_HOSTS = ['*']
 # Application definition
 
 INSTALLED_APPS = [
+    'channels',
+    'mariokrat',
     'django.contrib.contenttypes',
     'django.contrib.staticfiles',
-
-    'mariokrat',
 ]
 
 MIDDLEWARE = [
@@ -62,6 +62,15 @@ TEMPLATES = [
 ]
 
 WSGI_APPLICATION = 'main.wsgi.application'
+ASGI_APPLICATION = 'main.routing.application'
+CHANNEL_LAYERS = {
+    'default': {
+        'BACKEND': 'channels_redis.core.RedisChannelLayer',
+        'CONFIG': {
+            'hosts': [('redis', 6379)],
+        },
+    },
+}
 
 
 # Database
@@ -70,7 +79,7 @@ WSGI_APPLICATION = 'main.wsgi.application'
 DATABASES = {
     'default': {
         'ENGINE': 'django.db.backends.postgresql',
-        'HOST': 'db',
+        'HOST': 'postgres',
         'PORT': 5432,
         'NAME': 'mariokrat',
         'USER': 'mariokrat',

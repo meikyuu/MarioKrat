@@ -1,4 +1,4 @@
-import React, { useState, useEffect, useMemo } from 'react';
+import React, { useState, useEffect, useMemo, useRef } from 'react';
 import styled from 'styled-components';
 import api from '../../api';
 import theme from '../../theme';
@@ -87,10 +87,47 @@ const Rank = styled.div`
     font-weight: bold;
 `;
 
+const PROTOCOL_MAP = {
+    'http:': 'ws:',
+    'https:': 'wss:',
+};
+
+function applyChange(data, [path, value]) {
+    console.log('CHANGE', data, path, value);
+    if (path.length === 0) {
+        return value;
+    }
+
+    const [head, ...tail] = path;
+
+    if (Array.isArray(data)) {
+        return [
+            ...data.slice(0, head),
+            applyChange(data[head], [tail, value]),
+            ...data.slice(head + 1),
+        ];
+    } else if (typeof data === 'object') {
+        return {
+            ...data,
+            [head]: applyChange(data[head], [tail, value]),
+        };
+    } else {
+        throw new Error(`unknown key: ${head}`);
+    }
+}
+
+function applyChanges(data, changes) {
+    for (const change of changes) {
+        data = applyChange(data, change);
+    }
+    return data;
+}
+
 export default function ViewTournament({ token }) {
     const [tournament, setTournament] = useState(null);
     const [share, setShare] = useState(false);
     const [result, setResult] = useState(null);
+    const socketRef = useRef(null);
 
     const currentResult = (
         tournament !== null &&
@@ -108,7 +145,17 @@ export default function ViewTournament({ token }) {
             .catch((res) => {
                 // TODO show errors
             });
+
+        if (socketRef.current) {
+            socketRef.current.close();
+        }
+
+        socketRef.current = new WebSocket(`${PROTOCOL_MAP[window.location.protocol]}//${window.location.host}/api/tournament/${token}/`);
     }, [token]);
+
+    useEffect(() => {
+        socketRef.current.onmessage = (e) => setTournament(applyChanges(tournament, JSON.parse(e.data)));
+    }, [socketRef.current, tournament]);
 
     const rounds = useMemo(() => {
         if (tournament === null) {

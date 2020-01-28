@@ -117,6 +117,7 @@ export default function Game({ game, onClickNextRace }) {
                         x={2 + j}
                         y={baseY - 1}
                         active={
+                            next_race &&
                             next_race.game === game.name &&
                             next_race.cup === i + 1 &&
                             next_race.race === j + 1
@@ -126,7 +127,7 @@ export default function Game({ game, onClickNextRace }) {
                     </HeaderCell>
                 ))}
                 <HeaderCell x={2 + races} y={baseY - 1}>Score</HeaderCell>
-                {next_race.game === game.name && next_race.cup === i + 1 && (
+                {next_race && next_race.game === game.name && next_race.cup === i + 1 && (
                     <ActiveCell
                         x={1 + next_race.race}
                         y={baseY}
@@ -148,6 +149,7 @@ export default function Game({ game, onClickNextRace }) {
                                 x={2 + j}
                                 y={baseY + y}
                                 active={
+                                    next_race &&
                                     next_race.game === game.name &&
                                     next_race.cup === i + 1 &&
                                     next_race.race === j + 1
