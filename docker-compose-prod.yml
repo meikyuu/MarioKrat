@@ -17,6 +17,7 @@ services:
       - redis
     environment:
       - MK_DEBUG=False
+      - MK_SECRET=${SECRET}
 
   web:
     build:

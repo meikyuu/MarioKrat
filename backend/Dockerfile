@@ -1,14 +1,14 @@
 FROM python:3.7-buster
 
-RUN python -c 'import secrets; print(secrets.token_hex(32))' > /app_secret
-
 RUN mkdir -p /app/media
 VOLUME /app/media
 
-COPY . /app/src
+COPY requirements.txt /app/src/requirements.txt
 WORKDIR /app/src
 
 RUN pip install -qUr requirements.txt
+
+COPY . /app/src
 
 EXPOSE 8000/tcp
 

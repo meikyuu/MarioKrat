@@ -29,8 +29,7 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-with open('/app_secret') as fhandle:
-    SECRET_KEY = fhandle.read()
+SECRET_KEY = os.environ['MK_SECRET']
 DEBUG = parse_bool(os.environ['MK_DEBUG'])
 
 ALLOWED_HOSTS = ['*']

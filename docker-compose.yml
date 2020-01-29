@@ -17,6 +17,7 @@ services:
       - redis
     environment:
       - MK_DEBUG=True
+      - MK_SECRET=${SECRET:-dev}
 
   frontend:
     build: frontend
