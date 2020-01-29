@@ -12,6 +12,16 @@ https://docs.djangoproject.com/en/3.0/ref/settings/
 
 import os
 
+
+def parse_bool(value):
+    if value == 'True':
+        return True
+    elif value == 'False':
+        return False
+    else:
+        raise ValueError(value)
+
+
 # Build paths inside the project like this: os.path.join(BASE_DIR, ...)
 BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 
@@ -19,11 +29,9 @@ BASE_DIR = os.path.dirname(os.path.dirname(os.path.abspath(__file__)))
 # Quick-start development settings - unsuitable for production
 # See https://docs.djangoproject.com/en/3.0/howto/deployment/checklist/
 
-# SECURITY WARNING: keep the secret key used in production secret!
-SECRET_KEY = 'qxy6d=))np)gizhy89(j!x4xqu@p1^7amq#mebj__sh*$@6(%_'
-
-# SECURITY WARNING: don't run with debug turned on in production!
-DEBUG = True
+with open('/app_secret') as fhandle:
+    SECRET_KEY = fhandle.read()
+DEBUG = parse_bool(os.environ['MK_DEBUG'])
 
 ALLOWED_HOSTS = ['*']
 

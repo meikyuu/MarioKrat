@@ -1,0 +1,21 @@
+# Node
+FROM node:13.5 AS builder
+
+RUN mkdir app
+WORKDIR app
+
+COPY frontend/package.json .
+RUN yarn
+
+COPY frontend/src src
+COPY frontend/public public
+
+RUN PUBLIC_URL="/static/" yarn build
+
+# Nginx
+FROM nginx:1.17.6
+
+COPY web/nginx-prod.conf /etc/nginx/nginx.conf
+COPY --from=builder /app/build /app
+
+EXPOSE 80/tcp

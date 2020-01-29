@@ -1,0 +1,28 @@
+version: '3.6'
+
+services:
+
+  postgres:
+    build: postgres
+
+  redis:
+    build: redis
+
+  backend:
+    build:
+      context: backend
+      dockerfile: Dockerfile-prod
+    depends_on:
+      - postgres
+      - redis
+    environment:
+      - MK_DEBUG=False
+
+  web:
+    build:
+      context: .
+      dockerfile: web/Dockerfile-prod
+    depends_on:
+      - backend
+    ports:
+      - ${PORT:-80}:80
