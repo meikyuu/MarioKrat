@@ -6,6 +6,7 @@ import Slot from './Slot';
 import TournamentContext from './Context';
 import Scrollbars from 'react-custom-scrollbars';
 import Rainbow from '../../../image/Rainbow.svg';
+import Tooltip from '../../../component/Tooltip';
 
 const Container = styled.div`
     border-radius: 0.5rem;
@@ -142,7 +143,12 @@ export default function Game({ game, onClickNextRace }) {
                         <Cell x={1} y={baseY + y} textAlign="left">
                             <Slot slot={game.players[score.player]} />
                             {score.fag && (
-                                <>{' '}<InlineImg src={Rainbow} /></>
+                                <>
+                                    {' '}
+                                    <Tooltip trigger={<InlineImg src={Rainbow} />}>
+                                        {score.fag_points} {score.fag_points === 1 ? 'flikkerpunt' : 'flikkerpunten'}
+                                    </Tooltip>
+                                </>
                             )}
                         </Cell>
                         {score.races.map((position, j) => (
