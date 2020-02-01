@@ -4,6 +4,7 @@ import theme from '../../../theme';
 import range from '../../../helpers/range';
 import Slot from './Slot';
 import TournamentContext from './Context';
+import Scrollbars from 'react-custom-scrollbars';
 
 const Container = styled.div`
     border-radius: 0.5rem;
@@ -32,32 +33,22 @@ const Header = styled.div`
 `;
 
 const Content = styled.div`
-    display: flex;
-    flex-direction: column;
-    @media only screen and (min-width: 600px) {
-        /* Desktop */
-        flex-direction: row;
+    /* Content div of scrollbars */
+    > div > div:first-child {
+        display: flex;
+        flex-direction: column;
+        @media only screen and (min-width: 600px) {
+            /* Desktop */
+            flex-direction: row;
+        }
     }
-    padding: 0.5rem;
 `;
 
 const Table = styled.div`
     display: grid;
     grid-gap: 0.15rem 0.35rem;
-
-    margin-bottom: 0.5rem;
-    &:last-child {
-        margin-bottom: 0;
-    }
-    @media only screen and (min-width: 600px) {
-        /* Desktop */
-        flex: 1 1 auto;
-        margin-bottom: 0;
-        margin-right: 0.5rem;
-        &:last-child {
-            margin-right: 0;
-        }
-    }
+    flex: 1 1 auto;
+    margin: 0.5rem;
 `;
 
 const Cup = styled(Table)`
@@ -196,7 +187,11 @@ export default function Game({ game, onClickNextRace }) {
     return (
         <Container>
             <Header state={game.state}>Groep {game.name}</Header>
-            <Content>{cups}</Content>
+            <Content>
+                <Scrollbars autoHeight autoHeightMax={99999}>
+                    {cups}
+                </Scrollbars>
+            </Content>
         </Container>
     );
 }

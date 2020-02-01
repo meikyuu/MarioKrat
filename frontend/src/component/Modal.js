@@ -2,31 +2,34 @@ import React from 'react';
 import styled from 'styled-components';
 import theme from '../theme';
 import Icon from './Icon';
+import Scrollbars from 'react-custom-scrollbars';
 
-const OuterContainer = styled.div`
+const Wrapper = styled.div`
     position: fixed;
-    left: 0;
-    top: 0;
-    right: 0;
-    bottom: 0;
-    z-index: 100;
-    ${({ open }) => open ? `` : `
-        pointer-events: none;   
-    `}
-    display: flex;
-    align-items: center;
-    justify-content: center;
-`;
-
-const Background = styled.div`
-    position: absolute;
     left: 0;
     top: 0;
     width: 100%;
     height: 100%;
-    background-color: rgba(0, 0, 0, 0.5);
-    opacity: ${({ open }) => open ? 1 : 0};
-    transition: opacity 600ms ease;
+    z-index: 100;
+
+    ${({ open }) => open ? `
+        background-color: rgba(0, 0, 0, 0.5);
+    ` : `
+        pointer-events: none;   
+    `}
+
+    transition: background-color 600ms ease;
+`;
+
+const OuterContainer = styled.div`
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    min-height: 100%;
+`;
+
+const Fill = styled.div`
+    flex: 1 1 0;
 `;
 
 const InnerContainer = styled.div`
@@ -75,16 +78,36 @@ export default function Modal({
     size = '600px',
     onClose = () => {},
     children = null,
+    className = '',
     ...props
 }) {
     return (
-        <OuterContainer open={open}>
-            <Background open={open} onClick={onClose} />
-            <InnerContainer open={open} size={size} {...props}>
-                <CloseIcon name="times" onClick={onClose} />
-                <h3>{title}</h3>
-                {children}
-            </InnerContainer>
-        </OuterContainer>
+        <Wrapper open={open}>
+            <Scrollbars>
+                <OuterContainer onClick={(e) => {
+                    let node = e.target;
+                    while (node) {
+                        if (node.classList.contains('modal-inner-container')) {
+                            return;
+                        }
+                        node = node.parentElement;
+                    }
+                    onClose();
+                }}>
+                    <Fill />
+                    <InnerContainer
+                        open={open}
+                        size={size}
+                        className={`modal-inner-container ${className}`}
+                        {...props}
+                    >
+                        <CloseIcon name="times" onClick={onClose} />
+                        <h3>{title}</h3>
+                        {children}
+                    </InnerContainer>
+                    <Fill />
+                </OuterContainer>
+            </Scrollbars>
+        </Wrapper>
     );
 }
