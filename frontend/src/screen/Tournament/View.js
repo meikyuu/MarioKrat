@@ -155,7 +155,7 @@ export default function ViewTournament({ token }) {
 
     useEffect(() => {
         socketRef.current.onmessage = (e) => setTournament(applyChanges(tournament, JSON.parse(e.data)));
-    }, [socketRef.current, tournament]);
+    }, [token, tournament]);
 
     const rounds = useMemo(() => {
         if (tournament === null) {
