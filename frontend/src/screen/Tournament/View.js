@@ -236,9 +236,9 @@ export default function ViewTournament({ token }) {
                             <Bar size={0.8}>3</Bar>
                         </BarContainer>
                     </Bars>
-                    {tournament.ranks.slice(3).map((slot, rank) => (
+                    {tournament.ranks.slice(3).map(({ rank, ...slot }) => (
                         <Rank key={rank}>
-                            {rank + 3}. <Slot slot={slot} />
+                            {rank}. <Slot slot={slot} />
                         </Rank>
                     ))}
                 </Group>
