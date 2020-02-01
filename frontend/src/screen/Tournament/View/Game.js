@@ -5,6 +5,7 @@ import range from '../../../helpers/range';
 import Slot from './Slot';
 import TournamentContext from './Context';
 import Scrollbars from 'react-custom-scrollbars';
+import Rainbow from '../../../image/Rainbow.svg';
 
 const Container = styled.div`
     border-radius: 0.5rem;
@@ -87,6 +88,13 @@ const ActiveCell = styled(Cell)`
     border-radius: 0.2rem;
 `;
 
+const InlineImg = styled.img`
+    height: 1em;
+    position: relative;
+    top: 0.2em;
+    margin: 0 0.1em;
+`;
+
 export default function Game({ game, onClickNextRace }) {
     const { next_race } = useContext(TournamentContext);
 
@@ -133,6 +141,9 @@ export default function Game({ game, onClickNextRace }) {
                         </Cell>
                         <Cell x={1} y={baseY + y} textAlign="left">
                             <Slot slot={game.players[score.player]} />
+                            {score.fag && (
+                                <>{' '}<InlineImg src={Rainbow} /></>
+                            )}
                         </Cell>
                         {score.races.map((position, j) => (
                             <Cell

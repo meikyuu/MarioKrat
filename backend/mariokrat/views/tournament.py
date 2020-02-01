@@ -59,7 +59,7 @@ def tournament_data(tournament, include_admin_token=False):
         for cup in game.cups.order_by('number'):
             cup_done = True
             scores = [
-                {'player': i, 'races': [], 'points': 0}
+                {'player': i, 'races': [], 'points': 0, 'fag_points': 0}
                 for i in range(len(players))
             ]
             for race in cup.races.order_by('number'):
@@ -81,6 +81,20 @@ def tournament_data(tournament, include_admin_token=False):
                             'cup': cup.number,
                             'race': race.number,
                         }
+                else:
+                    fag = max(
+                        range(len(players)),
+                        key=lambda player: scores[player]['races'][-1],
+                    )
+                    scores[fag]['fag_points'] += 2 if race.number == 4 else 1
+
+            min_fag_points = min(score['fag_points'] for score in scores)
+            max_fag_points = max(score['fag_points'] for score in scores)
+            for score in scores:
+                score['fag'] = (
+                    min_fag_points < score['fag_points'] == max_fag_points
+                )
+
             # If there is only one cup we do not allow ending on the same
             # position because we need clear rankings from that cup, otherwise
             # this is handled in the total rank
