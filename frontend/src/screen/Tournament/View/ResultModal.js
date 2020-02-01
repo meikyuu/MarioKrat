@@ -2,8 +2,6 @@ import React, { useState, useContext, useMemo, useEffect } from 'react';
 import styled from 'styled-components';
 import api from '../../../api';
 import Modal from '../../../component/Modal';
-import Group from '../../../component/Group';
-import RadioButtons from '../../../component/RadioButtons';
 import Button from '../../../component/Button';
 import range from '../../../helpers/range';
 import theme from '../../../theme';
