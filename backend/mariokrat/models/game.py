@@ -9,3 +9,4 @@ class Game(models.Model):
         related_name='games',
     )
     name = models.TextField()
+    round = models.IntegerField()

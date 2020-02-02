@@ -39,6 +39,7 @@ class TestTournament(TestCase):
             }),
             'games': is_list_of({
                 'name': is_str,
+                'round': is_int,
                 'state': is_in({'waiting', 'active', 'done'}),
                 'players': is_list_of(is_dict_union(
                     player={
@@ -106,6 +107,7 @@ class TestTournament(TestCase):
                 ],
                 'games': [{
                     'name': 'A',
+                    'round': 1,
                     'state': state,
                     'players': [
                         {'type': 'player', 'player': 1},

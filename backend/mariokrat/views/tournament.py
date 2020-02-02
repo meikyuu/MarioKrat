@@ -74,9 +74,11 @@ def tournament_data(tournament, include_admin_token=False):
                     cup_done = False
                     if active and (
                         next_race is None or
-                        cup.number < next_race['cup']
+                        (game.round, cup.number) <
+                        (next_race['round'], next_race['cup'])
                     ):
                         next_race = {
+                            'round': game.round,
                             'game': game.name,
                             'cup': cup.number,
                             'race': race.number,
@@ -114,6 +116,7 @@ def tournament_data(tournament, include_admin_token=False):
 
         games.append({
             'name': game.name,
+            'round': game.round,
             'state': (
                 'done' if game_done else 'active' if active else 'waiting'
             ),
@@ -134,6 +137,9 @@ def tournament_data(tournament, include_admin_token=False):
             'cups': cups,
             'total': total,
         })
+
+    if next_race:
+        next_race.pop('round')
 
     data = {
         'token': tournament.spectator_token,

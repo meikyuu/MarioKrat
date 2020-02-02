@@ -31,78 +31,86 @@ def get_next_name(name):
 def schedule(tournament, shuffle=True):
     next_name = 'A'
     next_rank = 1
+    next_round_number = 1
 
     players = list(tournament.players.all())
 
     if shuffle:
         random.shuffle(players)
 
-    to_schedule = deque([[
+    to_schedule = deque([[[
         Slot.objects.create(tournament=tournament, player=player)
         for player in players
-    ]])
+    ]]])
 
     while to_schedule:
-        slots = to_schedule.popleft()
+        round = to_schedule.popleft()
+        next_round = []
 
-        # If we somehow only got 1 slot thats by definition a rank
-        if len(slots) == 1:
-            slots[0].rank = next_rank
-            next_rank += 1
-            continue
-
-        # Create games
-        games = []
-        for _ in range(math.ceil(len(slots) / tournament.game_size)):
-            game = Game.objects.create(
-                tournament=tournament,
-                name=next_name,
-            )
-            for cup_number in range(1, tournament.game_cups + 1):
-                cup = Cup.objects.create(game=game, number=cup_number)
-                for race_number in range(1, tournament.game_races + 1):
-                    Race.objects.create(cup=cup, number=race_number)
-
-            games.append(game)
-            next_name = get_next_name(next_name)
-
-        # Add players in to games
-        for game, slot in zip(cycle(games), slots):
-            slot.target = game
-            slot.save()
-
-        # Add players out to games
-        if len(games) == 1:
-            # Final game so we divide ranks here
-            game = games[0]
-            for pos in range(1, game.players_in.count() + 1):
-                Slot.objects.create(
-                    tournament=tournament,
-                    source=game,
-                    position=pos,
-                    rank=next_rank,
-                )
+        for slots in round:
+            # If we somehow only got 1 slot thats by definition a rank
+            if len(slots) == 1:
+                slots[0].rank = next_rank
                 next_rank += 1
-        else:
-            # We group the new slots by rank
-            new_slots = defaultdict(list)
-            for game in games:
-                players = game.players_in.count()
-                for pos in range(1, players + 1):
-                    rel_pos = (pos - 1) / (players - 1)
-                    new_slots[rel_pos].append(Slot.objects.create(
+                continue
+
+            # Create games
+            games = []
+            for _ in range(math.ceil(len(slots) / tournament.game_size)):
+                game = Game.objects.create(
+                    tournament=tournament,
+                    name=next_name,
+                    round=next_round_number,
+                )
+                for cup_number in range(1, tournament.game_cups + 1):
+                    cup = Cup.objects.create(game=game, number=cup_number)
+                    for race_number in range(1, tournament.game_races + 1):
+                        Race.objects.create(cup=cup, number=race_number)
+
+                games.append(game)
+                next_name = get_next_name(next_name)
+
+            # Add players in to games
+            for game, slot in zip(cycle(games), slots):
+                slot.target = game
+                slot.save()
+
+            # Add players out to games
+            if len(games) == 1:
+                # Final game so we divide ranks here
+                game = games[0]
+                for pos in range(1, game.players_in.count() + 1):
+                    Slot.objects.create(
                         tournament=tournament,
                         source=game,
                         position=pos,
-                    ))
-            # Divide into top half and bottom half
-            top_half = []
-            bottom_half = []
-            for key in sorted(new_slots):
-                if key <= 0.5:
-                    top_half.extend(new_slots[key])
-                else:
-                    bottom_half.extend(new_slots[key])
-            # Schedule halfs
-            to_schedule.append(top_half)
-            to_schedule.append(bottom_half)
+                        rank=next_rank,
+                    )
+                    next_rank += 1
+            else:
+                # We group the new slots by rank
+                new_slots = defaultdict(list)
+                for game in games:
+                    players = game.players_in.count()
+                    for pos in range(1, players + 1):
+                        rel_pos = (pos - 1) / (players - 1)
+                        new_slots[rel_pos].append(Slot.objects.create(
+                            tournament=tournament,
+                            source=game,
+                            position=pos,
+                        ))
+                # Divide into top half and bottom half
+                top_half = []
+                bottom_half = []
+                for key in sorted(new_slots):
+                    if key <= 0.5:
+                        top_half.extend(new_slots[key])
+                    else:
+                        bottom_half.extend(new_slots[key])
+                # Schedule halfs
+                next_round.append(top_half)
+                next_round.append(bottom_half)
+
+        if next_round:
+            to_schedule.append(next_round)
+        next_round_number += 1

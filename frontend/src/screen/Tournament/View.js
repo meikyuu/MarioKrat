@@ -162,35 +162,19 @@ export default function ViewTournament({ token }) {
             return null;
         }
 
-        const gamesProcessed = {};
-        const rounds = [];
-
-        while (true) {
-            const round = [];
-
-            for (const game of tournament.games) {
-                if (
-                    !gamesProcessed[game.name] &&
-                    game.players.every((slot) => (
-                        slot.type === 'player' ||
-                        (slot.type === 'slot' && gamesProcessed[slot.game])
-                    ))
-                ) {
-                    round.push(game);
-                }
+        const rounds = {};
+        for (const game of tournament.games) {
+            if (rounds[game.round] === undefined) {
+                rounds[game.round] = [];
             }
-
-            if (round.length === 0) {
-                break;
-            } else {
-                for (const game of round) {
-                    gamesProcessed[game.name] = true;
-                }
-                rounds.push(round);
-            }
+            rounds[game.round].push(game);
         }
 
-        return rounds;
+        return (
+            Object.entries(rounds)
+            .sort(([lround, lgames], [rround, rgames]) => lround - rround)
+            .map(([round, games]) => games)
+        );
     }, [tournament]);
 
     if (tournament === null) {
