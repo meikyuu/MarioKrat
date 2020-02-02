@@ -1,10 +1,19 @@
 import React, { useState, useContext } from 'react';
+import styled from 'styled-components';
+import QRCode from 'qrcode.react';
 import Modal from '../../../component/Modal';
 import RadioButtons from '../../../component/RadioButtons';
 import Input from '../../../component/Input';
 import HSplit from '../../../component/HSplit';
 import Button from '../../../component/Button';
 import TournamentContext from './Context';
+
+const StyledQRCode = styled(QRCode)`
+    display: block;
+    margin: 0 auto 1rem; 
+    border: 0.375rem solid #FFF;
+    border-radius: 0.375rem;
+`;
 
 const TYPE_OPTIONS = [
     { 
@@ -36,6 +45,7 @@ export default function ShareModal(props) {
                     options={TYPE_OPTIONS}
                 />
             )}
+            <StyledQRCode value={url} />
             <Input copy readonly value={url} />
             <HSplit>
                 <Button
