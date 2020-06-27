@@ -4,6 +4,7 @@ import useLocalState from '../../helpers/useLocalState';
 import theme from '../../theme';
 import Button from '../../component/Button';
 import Modal from '../../component/Modal';
+import BINGO from './bingo.png';
 
 const NoCard = styled.p`
     font-style: italic;
@@ -22,6 +23,7 @@ const Cards = styled.div`
     grid-auto-rows: auto;
     grid-gap: 0.5rem;
     margin-bottom: 1rem;
+    position: relative;
 `;
 
 const Card = styled.div`
@@ -60,14 +62,15 @@ const Card = styled.div`
     }
 `;
 
-const Bingo = styled.span`
+const Bingo = styled.img`
+    pointer-events: none;
     z-index: 2;
-    font-weight: bold;
-    font-size: 4rem;
-    color: ${theme.primaryColor};
-    left: -0.25rem;
-    top: -0.25rem;
-    width: unset;
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 80vw;
+    height: 80vw;
+    object-fit: contain;
     ${({ active }) => active ? `
         transform: translate(-50%, -50%) rotate(10deg);
     ` : `
@@ -131,20 +134,21 @@ export default function JipBingo() {
             {cards === null ? (
                 <NoCard>Je hebt nog geen bingokaart.</NoCard>
             ) : (
-                <Cards>{cards.map(({ text, checked }, i) => (
-                    <Card key={i} checked={checked} onClick={() => setCards([
-                        ...cards.slice(0, i),
-                        { ...cards[i], checked: !checked },
-                        ...cards.slice(i + 1),
-                    ])}>
-                        {i === 10 && (
-                            <Bingo active={cards.every(({ checked }) => checked)}>
-                                Bingo!
-                            </Bingo>
-                        )}
-                        <div>{text}</div>
-                    </Card>
-                ))}</Cards>
+                <Cards>
+                    {cards.map(({ text, checked }, i) => (
+                        <Card key={i} checked={checked} onClick={() => setCards([
+                            ...cards.slice(0, i),
+                            { ...cards[i], checked: !checked },
+                            ...cards.slice(i + 1),
+                        ])}>
+                            <div>{text}</div>
+                        </Card>
+                    ))}
+                    <Bingo
+                        src={BINGO}
+                        active={cards.every(({ checked }) => checked)}
+                    />
+                </Cards>
             )}
             <Button icon="random" onClick={cards === null ? setRandomCards : () => setRandomOpen(true)}>
                 Random Kaart
