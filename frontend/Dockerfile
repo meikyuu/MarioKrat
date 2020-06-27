@@ -4,7 +4,7 @@ RUN mkdir app
 WORKDIR app
 
 COPY package.json .
-RUN yarn
+RUN yarn && yarn cache clean
 
 COPY src src
 COPY public public

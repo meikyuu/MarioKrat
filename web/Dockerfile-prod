@@ -5,12 +5,12 @@ RUN mkdir app
 WORKDIR app
 
 COPY frontend/package.json .
-RUN yarn
+RUN yarn && yarn cache clean
 
 COPY frontend/src src
 COPY frontend/public public
 
-RUN PUBLIC_URL="/static/" yarn build
+RUN PUBLIC_URL="/static/" yarn build && yarn cache clean
 
 # Nginx
 FROM nginx:1.17.6
