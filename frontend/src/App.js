@@ -18,6 +18,7 @@ function route(path) {
 
 const Home = route('Home');
 const Tournament = route('Tournament');
+const JipBingo = route('JipBingo');
 
 const Container = styled.div`
     height: 100%;
@@ -38,6 +39,7 @@ function App() {
                         <Switch>
                             <Route exact path="/" render={(props) => <Home {...props} />} />
                             <Route path="/t/:token?" render={(props) => <Tournament {...props} />} />
+                            <Route path="/jip-bingo" render={(props) => <JipBingo {...props} />} />
                         </Switch>
                     </BrowserRouter>
                 </Wrapper>

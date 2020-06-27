@@ -20,6 +20,7 @@ services:
       - MK_SECRET=${SECRET:-dev}
 
   frontend:
+    stdin_open: true
     build: frontend
     volumes:
       - ./frontend/src:/app/src
