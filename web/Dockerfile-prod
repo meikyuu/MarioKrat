@@ -1,5 +1,5 @@
 # Node
-FROM node:13.5 AS builder
+FROM node:13.7 AS builder
 
 RUN mkdir app
 WORKDIR app
