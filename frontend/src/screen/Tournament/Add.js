@@ -10,7 +10,7 @@ import Form from '../../component/Form';
 import api from '../../api';
 
 export default function AddTournament() {
-    const [name, setName] = useState('MarioKrat');
+    const [name, setName] = useState('Mario Krat');
     const [players, setPlayers] = useState([
         { name: '' },
         { name: '' },
