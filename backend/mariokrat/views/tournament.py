@@ -181,9 +181,17 @@ def tournament_view(request, token=None):
     'players': is_list_of({
         'name': is_pre(is_str, is_not_blank),
     }),
+    'game_size': is_int,
+    'game_cups': is_int,
+    'game_races': is_int,
 })
 def tournament_list(request, data):
-    tournament = Tournament.objects.create(name=data['name'])
+    tournament = Tournament.objects.create(
+        name=data['name'],
+        game_size=data['game_size'],
+        game_cups=data['game_cups'],
+        game_races=data['game_races'],
+    )
     for n, player_data in enumerate(data['players'], 1):
         Player.objects.create(
             tournament=tournament,

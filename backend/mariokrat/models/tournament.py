@@ -12,8 +12,6 @@ class Tournament(models.Model):
     name = models.TextField()
     admin_token = models.TextField(default=get_token)
     spectator_token = models.TextField(default=get_token)
-
-    # TODO: these should probably be configurable
-    game_size = 4
-    game_cups = 2
-    game_races = 4
+    game_size = models.IntegerField()
+    game_cups = models.IntegerField()
+    game_races = models.IntegerField()

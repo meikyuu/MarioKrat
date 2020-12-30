@@ -9,7 +9,7 @@ const sets = {
     brands: 'fab',
 };
 
-const StyledIcon = styled(({ color, ...props }) => <i {...props} />)`
+const StyledIcon = styled(({ color, float, ...props }) => <i {...props} />)`
     ${({ color }) => color ? `
         color: ${color};
     ` : ``}

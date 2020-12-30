@@ -16,10 +16,10 @@ const GroupContainer = styled.section`
     }
 `;
 
-export default function Group({ label, children, innerRef, ...props }) {
+export default function Group({ label, labelProps = {}, children, innerRef, ...props }) {
     return (
         <GroupContainer ref={innerRef} {...props}>
-            <label>{label}</label>
+            <label {...labelProps}>{label}</label>
             {children}
         </GroupContainer>
     );

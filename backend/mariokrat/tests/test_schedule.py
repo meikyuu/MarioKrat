@@ -7,7 +7,12 @@ from ..schedule import schedule
 class TestSchedule(TestCase):
 
     def test_schedule_8_players(self):
-        tournament = Tournament.objects.create(name='Tournament')
+        tournament = Tournament.objects.create(
+            name='Tournament',
+            game_size=4,
+            game_cups=2,
+            game_races=4,
+        )
         players = [
             Player.objects.create(
                 tournament=tournament,

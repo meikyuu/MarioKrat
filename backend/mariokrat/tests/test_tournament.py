@@ -24,6 +24,9 @@ class TestTournament(TestCase):
                     {'name': f'Player {n}'}
                     for n in range(1, 9)
                 ],
+                'game_size': 4,
+                'game_cups': 2,
+                'game_races': 4,
             },
             content_type='application/json',
         )
@@ -81,7 +84,12 @@ class TestTournament(TestCase):
         }))
 
     def test_perform_tournament(self):
-        tournament = Tournament.objects.create(name='Tournament')
+        tournament = Tournament.objects.create(
+            name='Tournament',
+            game_size=4,
+            game_cups=2,
+            game_races=4,
+        )
         for n in range(1, 5):
             Player.objects.create(
                 tournament=tournament,
