@@ -116,9 +116,9 @@ export default function AddTournament() {
                             onChange={setGameRaces}
                         />
                     </Group>
-                    <Group label="Max Spelers per Ronde">
+                    <Group label="Max Spelers per Groep">
                         <NumberInput
-                            placeholder="Max Spelers per Ronde"
+                            placeholder="Max Spelers per Groep"
                             value={gameSize}
                             onChange={setGameSize}
                         />
