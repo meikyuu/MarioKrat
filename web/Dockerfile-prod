@@ -10,7 +10,7 @@ RUN yarn && yarn cache clean
 COPY frontend/src src
 COPY frontend/public public
 
-RUN yarn build && yarn cache clean
+RUN PUBLIC_URL="/static/" yarn build && yarn cache clean
 
 # Nginx
 FROM nginx:1.17.6
