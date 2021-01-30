@@ -16,7 +16,7 @@ export default function AddTournament() {
         { name: '' },
     ]);
     const [gameSize, setGameSize] = useState(4);
-    const [gameCups, setGameCups] = useState(2);
+    const [gameCups, setGameCups] = useState(1);
     const [gameRaces, setGameRaces] = useState(4);
     const playersRef = useRef(null);
     const history = useHistory();
