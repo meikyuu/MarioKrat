@@ -13,7 +13,7 @@ const StyledInput = styled.input`
     border: unset;
     font-size: 1rem;
     font-weight: bold;
-    padding: 0.5rem ${({ buttons }) => 0.5 + 1.5 * buttons}rem 0.5rem 0.5rem;
+    padding: 0.5rem ${({ buttons }) => 0.5 + 1.5 * buttons}rem;
     text-align: center;
     border-radius: 0.5rem;
     &:active, &:focus {
