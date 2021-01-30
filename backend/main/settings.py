@@ -41,7 +41,6 @@ INSTALLED_APPS = [
     'channels',
     'mariokrat',
     'django.contrib.contenttypes',
-    'django.contrib.staticfiles',
 ]
 
 MIDDLEWARE = [

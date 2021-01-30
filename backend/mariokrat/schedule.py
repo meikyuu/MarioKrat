@@ -55,8 +55,15 @@ def schedule(tournament, shuffle=True):
                 continue
 
             # Create games
+            game_count = math.ceil(len(slots) / tournament.game_size)
+            base_size, extra = divmod(len(slots), game_count)
+            game_sizes = [
+                base_size + (1 if i < extra else 0)
+                for i in range(game_count)
+            ]
             games = []
-            for _ in range(math.ceil(len(slots) / tournament.game_size)):
+            to_add = iter(slots)
+            for game_size in game_sizes:
                 game = Game.objects.create(
                     tournament=tournament,
                     name=next_name,
@@ -67,13 +74,13 @@ def schedule(tournament, shuffle=True):
                     for race_number in range(1, tournament.game_races + 1):
                         Race.objects.create(cup=cup, number=race_number)
 
+                for _ in range(game_size):
+                    slot = next(to_add)
+                    slot.target = game
+                    slot.save()
+
                 games.append(game)
                 next_name = get_next_name(next_name)
-
-            # Add players in to games
-            for game, slot in zip(cycle(games), slots):
-                slot.target = game
-                slot.save()
 
             # Add players out to games
             if len(games) == 1:

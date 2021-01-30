@@ -2,6 +2,7 @@ FROM python:3.7-buster
 
 RUN mkdir -p /app/media
 VOLUME /app/media
+ENV MEDIA_ROOT /app/media
 
 COPY requirements.txt /app/src/requirements.txt
 WORKDIR /app/src

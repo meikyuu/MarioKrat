@@ -12,7 +12,7 @@ from ..diff import diff
 
 from is_valid import (
     is_str, is_list_of, is_pre, is_not_blank, is_decodable_json_where, is_int,
-    is_in_range, is_dict_union,
+    is_in_range, is_dict_union, is_dict_where, is_bool,
 )
 
 
@@ -176,7 +176,7 @@ def tournament_view(request, token=None):
 
 
 @allow_methods('POST')
-@validate_body({
+@validate_body(is_dict_where({
     'name': is_pre(is_str, is_not_blank),
     'players': is_list_of({
         'name': is_pre(is_str, is_not_blank),
@@ -184,7 +184,9 @@ def tournament_view(request, token=None):
     'game_size': is_int,
     'game_cups': is_int,
     'game_races': is_int,
-})
+}, {
+    'shuffle': is_bool,
+}))
 def tournament_list(request, data):
     tournament = Tournament.objects.create(
         name=data['name'],
@@ -199,7 +201,7 @@ def tournament_list(request, data):
             name=player_data['name'],
         )
 
-    schedule(tournament)
+    schedule(tournament, shuffle=data.get('shuffle', True))
 
     return JsonResponse(tournament_data(tournament, True))
 

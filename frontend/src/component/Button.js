@@ -69,6 +69,10 @@ const components = {
 export default function Button({ icon, as = 'button', children, ...props }) {
     const Component = components[as];
 
+    if (as === 'button' && props.type === undefined) {
+        props.type = 'button';
+    }
+
     if (typeof icon === 'string') {
         icon = { name: icon };
     }

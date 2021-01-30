@@ -41,17 +41,17 @@ class TestSchedule(TestCase):
         )
         self.assertTrue(
             game_a.players_in
+            .filter(player=players[1])
+            .exists()
+        )
+        self.assertTrue(
+            game_a.players_in
             .filter(player=players[2])
             .exists()
         )
         self.assertTrue(
             game_a.players_in
-            .filter(player=players[4])
-            .exists()
-        )
-        self.assertTrue(
-            game_a.players_in
-            .filter(player=players[6])
+            .filter(player=players[3])
             .exists()
         )
 
@@ -60,17 +60,17 @@ class TestSchedule(TestCase):
         self.assertEqual(game_b.players_out.count(), 4)
         self.assertTrue(
             game_b.players_in
-            .filter(player=players[1])
-            .exists()
-        )
-        self.assertTrue(
-            game_b.players_in
-            .filter(player=players[3])
+            .filter(player=players[4])
             .exists()
         )
         self.assertTrue(
             game_b.players_in
             .filter(player=players[5])
+            .exists()
+        )
+        self.assertTrue(
+            game_b.players_in
+            .filter(player=players[6])
             .exists()
         )
         self.assertTrue(
