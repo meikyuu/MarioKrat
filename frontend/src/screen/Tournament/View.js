@@ -132,11 +132,13 @@ export default function ViewTournament({ token }) {
     const currentResult = (
         tournament !== null &&
         tournament.admin_token !== undefined &&
-        tournament.next_race !== null &&
+        tournament.next_races.length > 0 &&
         result !== null &&
-        result.game === tournament.next_race.game &&
-        result.cup === tournament.next_race.cup &&
-        result.race === tournament.next_race.race
+        tournament.next_races.some((next_race) => (
+            result.game === next_race.game &&
+            result.cup === next_race.cup &&
+            result.race === next_race.race
+        ))
     );
 
     useEffect(() => {
@@ -193,7 +195,7 @@ export default function ViewTournament({ token }) {
                                     key={i}
                                     game={game}
                                     players={tournament.players}
-                                    onClickNextRace={() => setResult(tournament.next_race)}
+                                    onClickNextRace={() => setResult(tournament.next_races.find((next_race) => next_race.game === game.name) || null)}
                                 />
                             ))}
                         </GridContainer>
@@ -232,10 +234,11 @@ export default function ViewTournament({ token }) {
                 open={share}
                 onClose={() => setShare(false)}
             />
-            {tournament.next_race && (
+            {result && (
                 <ResultModal
                     open={currentResult}
-                    onClose={() => setResult(false)}
+                    next_race={result}
+                    onClose={() => setResult(null)}
                     onChangeTournament={setTournament}
                 />
             )}

@@ -97,7 +97,8 @@ const InlineImg = styled.img`
 `;
 
 export default function Game({ game, onClickNextRace }) {
-    const { next_race } = useContext(TournamentContext);
+    const { next_races } = useContext(TournamentContext);
+    const next_race = next_races.find((next_race) => next_race.game === game.name) || null
 
     const cups = game.cups.map((cup, i) => {
         const baseY = game.cups.length > 1 ? 2 : 1;

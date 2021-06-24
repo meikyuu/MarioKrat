@@ -45,11 +45,12 @@ def add_ranks(scores, allow_equal=True):
 
 
 def tournament_data(tournament, include_admin_token=False):
-    next_race = None
+    next_races = []
     games = []
 
     for game in tournament.games.order_by('name'):
         players = list(game.players_in.order_by('position', 'id'))
+        next_race = None
 
         game_done = True
         active = all(slot.player is not None for slot in players)
@@ -112,6 +113,9 @@ def tournament_data(tournament, include_admin_token=False):
                         (POINTS[1] * cup.races.count())
                     )
 
+            if next_race is not None:
+                next_races.append(next_race)
+
         add_ranks(total, False)
 
         games.append({
@@ -138,7 +142,7 @@ def tournament_data(tournament, include_admin_token=False):
             'total': total,
         })
 
-    if next_race:
+    for next_race in next_races:
         next_race.pop('round')
 
     data = {
@@ -161,7 +165,7 @@ def tournament_data(tournament, include_admin_token=False):
             }
             for slot in tournament.slots.exclude(rank=None).order_by('rank')
         ],
-        'next_race': next_race,
+        'next_races': next_races,
     }
     if include_admin_token:
         data['admin_token'] = tournament.admin_token

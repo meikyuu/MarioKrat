@@ -51,8 +51,8 @@ const PositionPlayer = styled.div`
     ` : ``}
 `;
 
-export default function ResultModal({ onClose, onChangeTournament, ...props }) {
-    const { admin_token, next_race, games } = useContext(TournamentContext);
+export default function ResultModal({ next_race, onClose, onChangeTournament, ...props }) {
+    const { admin_token, games } = useContext(TournamentContext);
     const [results, setResults] = useState([]);
     const [drag, setDrag] = useState(null);
 
