@@ -30,7 +30,6 @@ def get_next_name(name):
 
 def schedule(tournament, shuffle=True):
     next_name = 'A'
-    next_rank = 1
     next_round_number = 1
 
     players = list(tournament.players.all())
@@ -38,20 +37,20 @@ def schedule(tournament, shuffle=True):
     if shuffle:
         random.shuffle(players)
 
-    to_schedule = deque([[[
+    to_schedule = deque([[(1, [
         Slot.objects.create(tournament=tournament, player=player)
         for player in players
-    ]]])
+    ])]])
 
     while to_schedule:
         round = to_schedule.popleft()
         next_round = []
 
-        for slots in round:
+        for next_rank, slots in round:
             # If we somehow only got 1 slot thats by definition a rank
             if len(slots) == 1:
                 slots[0].rank = next_rank
-                next_rank += 1
+                slots[0].save()
                 continue
 
             # Create games
@@ -115,8 +114,8 @@ def schedule(tournament, shuffle=True):
                     else:
                         bottom_half.extend(new_slots[key])
                 # Schedule halfs
-                next_round.append(top_half)
-                next_round.append(bottom_half)
+                next_round.append((next_rank, top_half))
+                next_round.append((next_rank + len(top_half), bottom_half))
 
         if next_round:
             to_schedule.append(next_round)

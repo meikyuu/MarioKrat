@@ -113,8 +113,8 @@ def tournament_data(tournament, include_admin_token=False):
                         (POINTS[1] * cup.races.count())
                     )
 
-            if next_race is not None:
-                next_races.append(next_race)
+        if next_race is not None:
+            next_races.append(next_race)
 
         add_ranks(total, False)
 

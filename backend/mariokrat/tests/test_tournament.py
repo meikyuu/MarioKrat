@@ -70,7 +70,7 @@ class TestTournament(TestCase):
                     'rank': is_in({1, 2, 3, 4}),
                 }),
             }),
-            'next_race': is_nullable({
+            'next_races': is_list_of({
                 'game': is_str,
                 'cup': is_int,
                 'race': is_int,
@@ -101,7 +101,7 @@ class TestTournament(TestCase):
         url = f'/api/tournament/{tournament.admin_token}/'
 
         def assert_tournament_state(
-            content, cups, total, next_race, ranks, state='active',
+            content, cups, total, next_races, ranks, state='active',
         ):
             assert_valid(content, is_decodable_json_where({
                 'name': 'Tournament',
@@ -126,7 +126,7 @@ class TestTournament(TestCase):
                     'cups': cups,
                     'total': total,
                 }],
-                'next_race': next_race,
+                'next_races': next_races,
                 'ranks': ranks,
             }))
 
@@ -210,7 +210,9 @@ class TestTournament(TestCase):
                 {'player': 2, 'points': 0, 'rank': 3},
                 {'player': 3, 'points': 0, 'rank': 4},
             ],
-            next_race={'game': 'A', 'cup': 1, 'race': 1},
+            next_races=[
+                {'game': 'A', 'cup': 1, 'race': 1},
+            ],
             ranks=[
                 {'rank': 1, 'game': 'A', 'position': 1, 'player': None},
                 {'rank': 2, 'game': 'A', 'position': 2, 'player': None},
@@ -308,7 +310,9 @@ class TestTournament(TestCase):
                 {'player': 2, 'points': 10, 'rank': 3},
                 {'player': 3, 'points': 8, 'rank': 4},
             ],
-            next_race={'game': 'A', 'cup': 1, 'race': 2},
+            next_races=[
+                {'game': 'A', 'cup': 1, 'race': 2},
+            ],
             ranks=[
                 {'rank': 1, 'game': 'A', 'position': 1, 'player': None},
                 {'rank': 2, 'game': 'A', 'position': 2, 'player': None},
@@ -406,7 +410,9 @@ class TestTournament(TestCase):
                 {'player': 2, 'points': 12, 'rank': 3},
                 {'player': 3, 'points': 11, 'rank': 4},
             ],
-            next_race={'game': 'A', 'cup': 1, 'race': 3},
+            next_races=[
+                {'game': 'A', 'cup': 1, 'race': 3},
+            ],
             ranks=[
                 {'rank': 1, 'game': 'A', 'position': 1, 'player': None},
                 {'rank': 2, 'game': 'A', 'position': 2, 'player': None},
@@ -504,7 +510,9 @@ class TestTournament(TestCase):
                 {'player': 3, 'points': 19, 'rank': 3},
                 {'player': 2, 'points': 13, 'rank': 4},
             ],
-            next_race={'game': 'A', 'cup': 1, 'race': 4},
+            next_races=[
+                {'game': 'A', 'cup': 1, 'race': 4},
+            ],
             ranks=[
                 {'rank': 1, 'game': 'A', 'position': 1, 'player': None},
                 {'rank': 2, 'game': 'A', 'position': 2, 'player': None},
@@ -602,7 +610,9 @@ class TestTournament(TestCase):
                 {'player': 3, 'points': 60 + 29, 'rank': 3},
                 {'player': 2, 'points': 0 + 15, 'rank': 4},
             ],
-            next_race={'game': 'A', 'cup': 2, 'race': 1},
+            next_races=[
+                {'game': 'A', 'cup': 2, 'race': 1},
+            ],
             ranks=[
                 {'rank': 1, 'game': 'A', 'position': 1, 'player': None},
                 {'rank': 2, 'game': 'A', 'position': 2, 'player': None},
@@ -733,7 +743,7 @@ class TestTournament(TestCase):
                 {'player': 3, 'points': 60 + 29 + 60 + 37, 'rank': 3},
                 {'player': 2, 'points': 0 + 15 + 120 + 45, 'rank': 4},
             ],
-            next_race=None,
+            next_races=[],
             ranks=[
                 {'rank': 1, 'game': 'A', 'position': 1, 'player': 1},
                 {'rank': 2, 'game': 'A', 'position': 2, 'player': 2},
@@ -742,3 +752,506 @@ class TestTournament(TestCase):
             ],
             state='done',
         )
+
+    def test_create_tournament_players_6_size_3(self):
+        res = self.client.post(
+            '/api/tournament/',
+            {
+                'name': 'Tournament',
+                'players': [
+                    {'name': f'Player {n}'}
+                    for n in range(1, 7)
+                ],
+                'game_size': 3,
+                'game_cups': 2,
+                'game_races': 4,
+                'shuffle': False,
+            },
+            content_type='application/json',
+        )
+
+        self.assertEqual(res.status_code, 200)
+        assert_valid(res.content, is_decodable_json_where({
+            'name': 'Tournament',
+            'token': is_str,
+            'admin_token': is_str,
+            'players': [
+                {'id': 1, 'name': 'Player 1'},
+                {'id': 2, 'name': 'Player 2'},
+                {'id': 3, 'name': 'Player 3'},
+                {'id': 4, 'name': 'Player 4'},
+                {'id': 5, 'name': 'Player 5'},
+                {'id': 6, 'name': 'Player 6'},
+            ],
+            'games': [
+                {
+                    'name': 'A',
+                    'round': 1,
+                    'state': 'active',
+                    'players': [
+                        {'type': 'player', 'player': 1},
+                        {'type': 'player', 'player': 2},
+                        {'type': 'player', 'player': 3},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 2,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 2,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                        {
+                            'player': 2,
+                            'points': 0,
+                            'rank': 3,
+                        },
+                    ],
+                },
+                {
+                    'name': 'B',
+                    'round': 1,
+                    'state': 'active',
+                    'players': [
+                        {'type': 'player', 'player': 4},
+                        {'type': 'player', 'player': 5},
+                        {'type': 'player', 'player': 6},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 2,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 2,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                        {
+                            'player': 2,
+                            'points': 0,
+                            'rank': 3,
+                        },
+                    ],
+                },
+                {
+                    'name': 'C',
+                    'round': 2,
+                    'state': 'waiting',
+                    'players': [
+                        {'type': 'slot', 'game': 'A', 'position': 1, 'player': None},
+                        {'type': 'slot', 'game': 'B', 'position': 1, 'player': None},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                    ],
+                },
+                {
+                    'name': 'D',
+                    'round': 2,
+                    'state': 'waiting',
+                    'players': [
+                        {'type': 'slot', 'game': 'A', 'position': 2, 'player': None},
+                        {'type': 'slot', 'game': 'B', 'position': 2, 'player': None},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                    ],
+                },
+                {
+                    'name': 'E',
+                    'round': 2,
+                    'state': 'waiting',
+                    'players': [
+                        {'type': 'slot', 'game': 'A', 'position': 3, 'player': None},
+                        {'type': 'slot', 'game': 'B', 'position': 3, 'player': None},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                    ],
+                },
+                {
+                    'name': 'F',
+                    'round': 3,
+                    'state': 'waiting',
+                    'players': [
+                        {'type': 'slot', 'game': 'C', 'position': 1, 'player': None},
+                        {'type': 'slot', 'game': 'D', 'position': 1, 'player': None},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                    ],
+                },
+                {
+                    'name': 'G',
+                    'round': 3,
+                    'state': 'waiting',
+                    'players': [
+                        {'type': 'slot', 'game': 'C', 'position': 2, 'player': None},
+                        {'type': 'slot', 'game': 'D', 'position': 2, 'player': None},
+                    ],
+                    'cups': [
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                        [
+                            {
+                                'player': 0,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                            {
+                                'player': 1,
+                                'races': [None, None, None, None],
+                                'points': 0,
+                                'fag_points': 0,
+                                'fag': False,
+                                'rank': 1,
+                            },
+                        ],
+                    ],
+                    'total': [
+                        {
+                            'player': 0,
+                            'points': 0,
+                            'rank': 1,
+                        },
+                        {
+                            'player': 1,
+                            'points': 0,
+                            'rank': 2,
+                        },
+                    ],
+                },
+            ],
+            'next_races': [
+                {'game': 'A', 'cup': 1, 'race': 1},
+                {'game': 'B', 'cup': 1, 'race': 1},
+            ],
+            'ranks': [
+                {'rank': 1, 'game': 'F', 'position': 1, 'player': None},
+                {'rank': 2, 'game': 'F', 'position': 2, 'player': None},
+                {'rank': 3, 'game': 'G', 'position': 1, 'player': None},
+                {'rank': 4, 'game': 'G', 'position': 2, 'player': None},
+                {'rank': 5, 'game': 'E', 'position': 1, 'player': None},
+                {'rank': 6, 'game': 'E', 'position': 2, 'player': None},
+            ],
+        }))
