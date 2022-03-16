@@ -204,7 +204,7 @@ export default function Game({ game, onClickNextRace }) {
 
     return (
         <Container>
-            <Header state={game.state}>Groep {game.name}</Header>
+            <Header data-test={`group ${game.name}`} state={game.state}>Groep {game.name}</Header>
             <Content>
                 <Scrollbars autoHeight autoHeightMax={99999}>
                     {cups}

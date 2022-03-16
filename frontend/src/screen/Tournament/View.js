@@ -189,7 +189,7 @@ export default function ViewTournament({ token }) {
                 <h1>{tournament.name}</h1>
                 {rounds.map((round, i) => (
                     <Group label={`Ronde ${i + 1}`}>
-                        <GridContainer key={i} maxWidth={2}>
+                        <GridContainer key={i} maxWidth={2} data-test={`grid-container ${i + 1}`}>
                             {round.map((game, i) => (
                                 <Game
                                     key={i}
