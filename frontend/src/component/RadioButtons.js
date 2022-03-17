@@ -48,7 +48,7 @@ const Button = styled.button`
 export default function RadioButtons({ value, onChange, options }) {
     const active = options.findIndex((option) => option.value === value);
     return (
-        <Container>
+        <Container data-test={`groepsindeling-button`}>
             {active !== -1 && (
                 <Highlight active={active} options={options.length} />
             )}
