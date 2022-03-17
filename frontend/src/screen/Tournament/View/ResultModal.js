@@ -173,7 +173,7 @@ export default function ResultModal({ next_race, onClose, onChangeTournament, ..
                     api.post(`tournament/${admin_token}/`, { ...next_race, positions: results })
                     .then((res) => onChangeTournament(res.data))
                 )}
-            >
+            data-test={`bevestigen-button`}>
                 Bevestigen
             </Button>
         </Modal>

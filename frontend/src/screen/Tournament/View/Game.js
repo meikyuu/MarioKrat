@@ -129,7 +129,7 @@ export default function Game({ game, onClickNextRace }) {
                 ))}
                 <HeaderCell x={2 + races} y={baseY - 1}>Score</HeaderCell>
                 {next_race && next_race.game === game.name && next_race.cup === i + 1 && (
-                    <ActiveCell
+                    <ActiveCell data-test={`result-button ${next_race.race}`}
                         x={1 + next_race.race}
                         y={baseY}
                         height={game.players.length}
@@ -138,7 +138,7 @@ export default function Game({ game, onClickNextRace }) {
                 )}
                 {cup.map((score, y) => (
                     <React.Fragment key={y}>
-                        <Cell x={0} y={baseY + y}>
+                        <Cell data-test={`group-rank ${y + 1}`} x={0} y={baseY + y}>
                             {score.rank}
                         </Cell>
                         <Cell x={1} y={baseY + y} textAlign="left">
@@ -167,7 +167,7 @@ export default function Game({ game, onClickNextRace }) {
                                 {position || '-'}
                             </Cell>
                         ))}
-                        <Cell x={2 + races} y={baseY + y}>
+                        <Cell data-test={`score ${y + 1}`} x={2 + races} y={baseY + y}>
                             {score.points} 
                         </Cell>
                     </React.Fragment>
@@ -203,8 +203,8 @@ export default function Game({ game, onClickNextRace }) {
     }
 
     return (
-        <Container>
-            <Header data-test={`group ${game.name}`} state={game.state}>Groep {game.name}</Header>
+        <Container data-test={`group-container ${game.name}`}>
+            <Header state={game.state}>Groep {game.name}</Header>
             <Content>
                 <Scrollbars autoHeight autoHeightMax={99999}>
                     {cups}

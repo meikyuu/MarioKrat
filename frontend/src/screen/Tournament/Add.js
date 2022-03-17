@@ -141,7 +141,7 @@ export default function AddTournament() {
                 </Group>
                 <Group label="Spelers" innerRef={playersRef}>
                     {playerNodes}
-                    <Button onClick={() => setPlayers([...players, { name: '' }])}>
+                    <Button data-test={`Speler-Toevoegen`} onClick={() => setPlayers([...players, { name: '' }])}>
                         Speler Toevoegen
                     </Button>
                 </Group>

@@ -29,7 +29,7 @@ const CollapsibleContainer = styled.section`
 export default function Collapsible({ label, children, ...props }) {
     const [open, setOpen] = useState(false);
     return (
-        <CollapsibleContainer open={open}>
+        <CollapsibleContainer data-test={`collapsible`} open={open}>
             <label onClick={() => setOpen(!open)}>
                 {label}
                 <Icon name={`chevron-${open ? 'up' : 'down'}`} />
