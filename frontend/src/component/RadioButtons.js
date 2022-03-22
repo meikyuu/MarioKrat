@@ -58,6 +58,7 @@ export default function RadioButtons({ value, onChange, options }) {
                 }
                 return (
                     <Button
+                        data-test={`random-button ${active}`}
                         type="button"
                         key={i}
                         active={i === active}
